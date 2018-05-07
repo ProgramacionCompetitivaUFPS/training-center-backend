@@ -4,6 +4,7 @@ const authService = require('../services/authenticationService')
 const User = require('../models').users
 const Mailer = require('../services/mailer')
 const ViewRender = require('../services/renderTemplate')
+const moment = require('moment')
 
 /**
  * Authentication Controller
@@ -74,7 +75,12 @@ function recovery(req, res) {
     })
 }
 
+function getDate(req, res) {
+    res.status(200).send({ date: moment() })
+}
+
 module.exports = {
     signIn,
-    recovery
+    recovery,
+    getDate
 }

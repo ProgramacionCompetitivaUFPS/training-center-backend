@@ -3,7 +3,7 @@ env('.env')
 
 module.exports = {
     development: {        
-        url: '',
+        url: process.env.DATABASE_URL,
         dialect: 'mysql'
     },
     production: {

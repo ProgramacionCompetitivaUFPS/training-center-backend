@@ -36,6 +36,7 @@ router.get('/', function(req, res, next) {
 
 /* GET */
 router.get('/recovery', authCtrl.recovery )
+router.get('/server-date', authCtrl.getDate )
 
 /* POST */
 router.post('/super-user', auth.isAuth, userCtrl.signUp )
