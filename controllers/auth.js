@@ -43,7 +43,10 @@ function signIn(req, res) {
 function recovery(req, res) {
     //url imagen: src="https://dl.dropboxusercontent.com/s/6kcxyp2o1tb7zgj/bg.jpg?dl=0"
     let options = {
-        from: process.env.FROM_ACCOUNT,
+        from: {
+            name: 'UFPS Training Center',
+            address: process.env.FROM_ACCOUNT
+        },
         to: req.query.email,
         subject: 'Recuperación de contraseña'
     };
