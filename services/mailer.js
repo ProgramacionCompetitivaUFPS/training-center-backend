@@ -39,7 +39,6 @@ function createTransport () {
       });*/
   return nodemailer.createTransport({
     service: process.env.SMTP_SERVICE,
-    host: this.service,
     port: process.env.SMTP_PORT,
     secure: false,
     ignoreTLS: true,
