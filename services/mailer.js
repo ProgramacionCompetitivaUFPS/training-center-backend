@@ -11,7 +11,7 @@ const nodemailer = require("nodemailer")
  * Instance a transportation method with the given configuration options
  * @returns
  */
-function createTransport() {
+function createTransport () {
   /*if (process.env.USE_SMTP_XOAUTH2) {
         let generator = require('xoauth2').createXOAuth2Generator({
           user: process.env.SMTP_USER,
@@ -37,9 +37,13 @@ function createTransport() {
           'pass': process.env.SMTP_PASSWORD
         }
       });*/
-
   return nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
+    service: process.env.SMTP_SERVICE,
+    host: this.service,
+    port: process.env.SMTP_PORT,
+    secure: false,
+    ignoreTLS: true,
+    requireTLS: false,
     auth: {
       user: process.env.SMTP_USER,
       pass: process.env.SMTP_PASSWORD
