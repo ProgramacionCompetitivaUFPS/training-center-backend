@@ -67,7 +67,7 @@ function update(req, res) {
 function findFiles(req, res, condition) {
     Problem.findById(req.params.id).then(problem => {
         req.body.oldInput = problem.input
-        req.body.oldOutput = proble.output
+        req.body.oldOutput = problem.output
 
         makeUpdate(req, res, condition)
     }).catch((err) => {
