@@ -43,7 +43,7 @@ function update(req, res) {
     if (req.user.usertype == 0) {
         return res.status(401).send({ error: 'No se encuentra autorizado' })
     }
-
+    req.body = req.body.data
     let condition = {
         id: req.params.id
     }
@@ -54,10 +54,9 @@ function update(req, res) {
 
     req.body.category_id = req.body.category
 
-    if (req.files) {
+    if (req.files['input'] || req.files['output']) {
         if (req.files['input']) req.body.input = req.files['input'][0].path
         if (req.files['output']) req.body.output = req.files['output'][0].path
-
         findFiles(req, res, condition)
     } else {
         makeUpdate(req, res, condition)
@@ -66,8 +65,8 @@ function update(req, res) {
 
 function findFiles(req, res, condition) {
     Problem.findById(req.params.id).then(problem => {
-        req.body.oldInput = problem.input
-        req.body.oldOutput = problem.output
+        if (req.files['input']) req.body.oldInput = problem.input
+        if (req.files['output']) req.body.oldOutput = problem.output
 
         makeUpdate(req, res, condition)
     }).catch((err) => {
