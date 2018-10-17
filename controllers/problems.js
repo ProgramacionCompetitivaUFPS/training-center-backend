@@ -124,7 +124,19 @@ function get(req, res) {
         where: {
             id: req.params.id
         },
-        include: [ { model: User, attributes: ['name', 'id', 'username', 'email'] } ],
+        include: [ 
+            { model: User, attributes: ['name', 'id', 'username', 'email'] },
+            { 
+                model: Submission, 
+                as: 'submissions',
+                attributes: ['user_id'],
+                where: {
+                    user_id: req.user.sub,
+                    verdict: 'Accepted'
+                },
+                required: false
+            } 
+        ],
         attributes: ['id', 'title_es', 'title_en', 'level', 'description_en', 'description_es',
             'example_input', 'example_output', 'category_id', 'user_id', 'time_limit']
     })
