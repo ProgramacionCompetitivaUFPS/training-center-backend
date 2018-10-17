@@ -210,7 +210,20 @@ function list(req, res) {
     
             Problem.findAndCountAll({
                 where: condition,
+                distinct: 'id',
                 attributes: ['id', 'title_es', 'title_en', 'level', 'user_id'],
+                include: [ 
+                    { 
+                        model: Submission, 
+                        as: 'submissions',
+                        attributes: ['user_id'],
+                        where: {
+                            user_id: req.user.sub,
+                            verdict: 'Accepted'
+                        },
+                        required: false
+                    }
+                ],
                 limit: limit,
                 order: order,
                 offset: offset,
@@ -229,7 +242,20 @@ function list(req, res) {
     } else {
         Problem.findAndCountAll({
             where: condition,
+            distinct: 'id',
             attributes: ['id', 'title_es', 'title_en', 'level', 'user_id'],
+            include: [ 
+                { 
+                    model: Submission, 
+                    as: 'submissions',
+                    attributes: ['user_id'],
+                    where: {
+                        user_id: req.user.sub,
+                        verdict: 'Accepted'
+                    },
+                    required: false
+                }
+            ],
             limit: limit,
             order: order,
             offset: offset,
