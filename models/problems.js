@@ -83,6 +83,8 @@ module.exports = function (sequelize, DataTypes) {
             }
           })
 
+          Problems.hasMany( models.submissions, {as: 'submissions'})
+
           Problems.belongsTo(models.users, {
             onDelete: "CASCADE",
             foreignKey: {
