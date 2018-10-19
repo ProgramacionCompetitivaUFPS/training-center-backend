@@ -3,6 +3,7 @@
 const Material = require('../models').materials
 const Category = require('../models').categories
 const User = require('../models').users
+const path = require('path')
 const _ = require('lodash')
 const files = require('../services/files')
 
