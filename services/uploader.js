@@ -28,7 +28,8 @@ var multer_storage = multer.diskStorage({
                 fieldname = raw.toString('hex') + moment() + ext
             if( file.fieldname == 'code' )
                 fieldname = raw.toString('hex') + moment() + path.extname(file.originalname)
-
+            if( file.fieldname == 'pdf')
+                fieldname = raw.toString('hex') + moment() + '.pdf'
             cb(null, fieldname )
         })
     }
@@ -55,7 +56,7 @@ var materialsDataFilter = function (req, file, cb) {
 var submissionsDataFilter = function (req, file, cb) {
     let ext = path.extname( file.originalname );
     
-    if ( ext !== '.cpp' && ext !== '.java' && ext !== '.py'  ) {
+    if ( ext !== '.cpp' && ext !== '.cc' && ext !== '.cxx' && ext !== '.c' && ext !== '.cp' && ext !== '.java' && ext !== '.py'  ) {
         return cb( new Error('Sólo estan permitidos archivos .cpp, .java y .py') )
     }
     cb(null, true)
