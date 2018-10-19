@@ -241,6 +241,10 @@ function approve (req, res){
 
 }
 
+function getPdf(req,res){
+  return res.sendFile( path.join( path.dirname(__dirname), 'files', 'materials', req.params.id ) )
+}
+
 module.exports = {
     create,
     remove,
@@ -249,5 +253,6 @@ module.exports = {
     list,
     index,
     pending,
-    update
+    update,
+    getPdf
 }
