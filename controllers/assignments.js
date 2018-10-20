@@ -98,7 +98,10 @@ function get(req, res) {
                         attributes: ['user_id', 'assignment_problem_id', 'contest_problem_id'],
                         where: {
                             user_id: req.user.sub,
-                            verdict: 'Accepted'
+                            verdict: 'Accepted',
+                            assignment_problem_id: {
+                                $ne: null
+                            }
                         },
                         required: false
                     }
