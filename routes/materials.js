@@ -23,6 +23,7 @@ var materialUpload = upload.fields([
 materials.get('/', materialsCtrl.index )
 materials.get('/pending', auth.isAuth, materialsCtrl.pending )
 materials.get('/:id', materialsCtrl.get )
+materials.get('/pdf/:id', materialsCtrl.getPdf )
 materials.post('/', auth.isAuth, materialUpload, materialsCtrl.create )
 materials.put('/:id', auth.isAuth, materialUpload, materialsCtrl.update )
 materials.delete('/:id', auth.isAuth, materialsCtrl.remove )
