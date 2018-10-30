@@ -2,6 +2,7 @@
 
 const Contest = require('../models').contests
 const ContestProblems = require('../models').contests_problems
+const Submissions = require('../models').submissions
 const Problem = require('../models').problems
 const User = require('../models').users
 const ContestStudent = require('../models').contests_students
@@ -151,7 +152,22 @@ function getProblems(req, res) {
                model: Problem, 
                as: 'problems',
                attributes: ['id', 'title_es', 'title_en', 'level'],
-               through: { attributes: ['id'] }
+               through: { attributes: ['id'] },
+               include: [ 
+                    { 
+                        model: Submissions, 
+                        as: 'submissions',
+                        attributes: ['id','user_id', 'assignment_problem_id', 'contest_problem_id'],
+                        where: {
+                            user_id: req.user.sub,
+                            verdict: 'Accepted',
+                            contest_problem_id: {
+                                $ne: null
+                            }
+                        },
+                        required: false
+                    }
+                ]
            } 
        ]
    }).then( (contest) => {

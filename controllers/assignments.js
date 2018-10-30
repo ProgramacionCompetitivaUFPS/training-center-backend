@@ -90,7 +90,22 @@ function get(req, res) {
                 model: Problem,
                 as: 'problems',
                 attributes: ['id', 'title_es', 'title_en', 'level', 'category_id', 'time_limit'],
-                through: { attributes: ['id'] }
+                through: { attributes: ['id'] },
+                include: [ 
+                    { 
+                        model: Submissions, 
+                        as: 'submissions',
+                        attributes: ['user_id', 'assignment_problem_id', 'contest_problem_id'],
+                        where: {
+                            user_id: req.user.sub,
+                            verdict: 'Accepted',
+                            assignment_problem_id: {
+                                $ne: null
+                            }
+                        },
+                        required: false
+                    }
+                ]
         	} 
         ],
         attributes: ['id', 'tittle', 'init_date', 'description', 'end_date', 'syllabus_id']
