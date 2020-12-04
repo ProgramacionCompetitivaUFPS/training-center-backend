@@ -32,6 +32,7 @@ platform.on('connection', function(socket){
 
 socketApi.notifySubmissionResult = function( user_id, problem_id, verdict, problem_name ){
     getSocket( user_id, ( socket_id ) => {
+        console.log( 'Socket ENVIO: ' + socket_id )
         platform.to(socket_id).emit('new result',{
             user_id: user_id,
             problem_id: problem_id,
@@ -41,7 +42,7 @@ socketApi.notifySubmissionResult = function( user_id, problem_id, verdict, probl
     })
 }
 
-socketApi.refreshScoreboard = function( user_id, problem_id, verdict, submission_id, problem_name ){
+socketApi.refreshScoreboard = function( user_id, problem_id, verdict, submission_id, problem_name, created_at ){
     console.log('***********************************************'
                 +'**********************************************'
                 +'**********************************************'
@@ -58,7 +59,8 @@ socketApi.refreshScoreboard = function( user_id, problem_id, verdict, submission
         problem_id: problem_id,
         verdict: verdict,
         submission_id: submission_id, 
-        problem_name: problem_name
+        problem_name: problem_name,
+        created_at: created_at
     })
 }
 

@@ -256,6 +256,7 @@ function list(req, res) {
             where: condition,
             distinct: 'id',
             attributes: ['id', 'title_es', 'title_en', 'level', 'user_id'],
+            limit: limit,
             include: [ 
                 { 
                     model: Submission, 
@@ -268,7 +269,6 @@ function list(req, res) {
                     required: false
                 }
             ],
-            limit: limit,
             order: order,
             offset: offset,
         }).then((response) => {
