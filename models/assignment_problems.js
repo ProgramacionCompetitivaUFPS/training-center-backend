@@ -1,4 +1,17 @@
 'use strict';
+
+/**
+ * Asignements problems Model
+ */
+
+/**
+ * Instance a Asignements problems model
+ * @param {any} sequelize
+ * @param {any} DataTypes
+ * @returns
+ */
+
+
 module.exports = (sequelize, DataTypes) => {
     var assignment_problems = sequelize.define('assignment_problems', {
         id: {
@@ -29,6 +42,8 @@ module.exports = (sequelize, DataTypes) => {
         underscored: true,
         underscoredAll: true
     });
+
+    //Class methods
 
     assignment_problems.associate = function(models) {
         // associations can be defined here

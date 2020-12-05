@@ -1,63 +1,52 @@
 'use strict';
 module.exports = {
-    up: (queryInterface, Sequelize) => {
-        return queryInterface.createTable('materials', {
+    up: async(queryInterface, Sequelize) => {
+        await queryInterface.createTable('forums', {
             id: {
                 allowNull: false,
                 autoIncrement: true,
                 primaryKey: true,
                 type: Sequelize.INTEGER
             },
-            name: {
-                allowNull: false,
-                type: Sequelize.STRING
-            },
-            category_id: {
-                allowNull: true,
-                type: Sequelize.INTEGER,
-                references: {
-                    model: 'categories',
-                    key: 'id'
-                }
-            },
             user_id: {
-                allowNull: true,
+                allowNull: false,
                 type: Sequelize.INTEGER,
                 references: {
                     model: 'users',
                     key: 'id'
                 }
             },
+            root_id_forum: {
+                allowNull: false,
+                type: Sequelize.INTEGER,
+                references: {
+                    model: 'forums',
+                    key: 'id'
+                }
+            },
             description: {
                 allowNull: false,
-                type: Sequelize.STRING
+                type: Sequelize.TEXT
             },
-            url: {
-                allowNull: false,
-                type: Sequelize.STRING
-            },
-            status: {
-                allowNull: false,
-                type: Sequelize.BOOLEAN
-            },
-            type: {
+            is_closed: {
                 allowNull: false,
                 type: Sequelize.INTEGER
             },
-            body: {
-                type: Sequelize.TEXT
+            status_view: {
+                allowNull: false,
+                type: Sequelize.INTEGER
             },
-            created_at: {
+            createdAt: {
                 allowNull: false,
                 type: Sequelize.DATE
             },
-            updated_at: {
+            updatedAt: {
                 allowNull: false,
                 type: Sequelize.DATE
             }
         });
     },
-    down: (queryInterface, Sequelize) => {
-        return queryInterface.dropTable('materials');
+    down: async(queryInterface, Sequelize) => {
+        await queryInterface.dropTable('forums');
     }
 };

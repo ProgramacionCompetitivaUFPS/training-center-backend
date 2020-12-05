@@ -49,6 +49,13 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: false,
             type: DataTypes.BOOLEAN,
         },
+        type: {
+            allowNull: false,
+            type: DataTypes.INTEGER,
+        },
+        body: {
+            type: DataTypes.TEXT,
+        },
         user_id: {
             allowNull: true,
             type: DataTypes.INTEGER,
@@ -69,19 +76,20 @@ module.exports = (sequelize, DataTypes) => {
             }
         })
 
+        Materials.hasMany(models.tags, { as: 'tags' })
+
         Materials.belongsTo(sequelize.models.categories, {
             onDelete: "NULL",
             foreignKey: {
                 allowNull: true
             }
         })
-    };
 
-    /*
-            Materials.belongsToMany(sequelize.models.syllabuses, {
-                through: 'syllabus_materials',
-                as: 'syllabuses'
-            })*/
+        Materials.belongsToMany(sequelize.models.syllabuses, {
+            through: 'syllabus_materials',
+            as: 'syllabuses'
+        })
+    };
 
 
     return Materials;

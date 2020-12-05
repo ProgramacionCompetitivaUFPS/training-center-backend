@@ -1,33 +1,15 @@
 'use strict';
-
-/**
- * Contests students Model
- */
-
-/**
- * Instance a contest student model
- * @param {any} sequelize
- * @param {any} DataTypes
- * @returns
- */
+const {
+    Model
+} = require('sequelize');
 
 module.exports = (sequelize, DataTypes) => {
-    var contests_students = sequelize.define('contests_students', {
+    var reports_forums = sequelize.define('reports_forums', {
         id: {
             allowNull: false,
             autoIncrement: true,
             primaryKey: true,
             type: DataTypes.INTEGER
-        },
-        contest_id: {
-            type: DataTypes.INTEGER,
-            references: {
-                model: 'contests',
-                key: 'id',
-                onDelete: 'CASCADE'
-            },
-            allowNull: false,
-            unique: 'UK01'
         },
         user_id: {
             type: DataTypes.INTEGER,
@@ -38,15 +20,30 @@ module.exports = (sequelize, DataTypes) => {
             },
             allowNull: false,
             unique: 'UK01'
+        },
+        forum_id: {
+            type: DataTypes.INTEGER,
+            references: {
+                model: 'forums',
+                key: 'id',
+                onDelete: 'CASCADE'
+            },
+            allowNull: false,
+            unique: 'UK01'
+        },
+        reason: {
+            type: DataTypes.TEXT
         }
     }, {
-
         underscored: true,
-        underscoredAll: true
+        underscoredAll: true,
     });
 
-    contests_students.associate = (models) => {
+    //class methods
+    reports_forums.associate = (models) => {
 
+        reports_forums.belongsTo(models.users)
     }
-    return contests_students;
+
+    return reports_forums;
 };

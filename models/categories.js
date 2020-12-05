@@ -22,6 +22,10 @@ module.exports = function(sequelize, DataTypes) {
                     msg: "El nombre de la catgoria debe tener entre 2 y 128 caracteres."
                 }
             }
+        },
+        type: {
+            allowNull: false,
+            type: DataTypes.INTEGER
         }
     }, {
         underscored: true,

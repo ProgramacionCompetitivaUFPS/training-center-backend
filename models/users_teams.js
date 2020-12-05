@@ -1,43 +1,34 @@
 'use strict';
-
-/**
- * Contests problems Model
- */
-
-/**
- * Instance a constest problem model
- * @param {any} sequelize
- * @param {any} DataTypes
- * @returns
- */
-
+const {
+    Model
+} = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
-
-    var contests_problems = sequelize.define('contests_problems', {
+    var users_teams = sequelize.define('users_teams', {
         id: {
             allowNull: false,
             autoIncrement: true,
             primaryKey: true,
             type: DataTypes.INTEGER
         },
-        problem_id: {
+        user_id: {
             type: DataTypes.INTEGER,
             references: {
-                model: 'problems',
+                model: 'users',
                 key: 'id'
             },
             allowNull: false,
             unique: 'UK01'
         },
-        contest_id: {
+        team_id: {
             type: DataTypes.INTEGER,
             references: {
-                model: 'contests',
+                model: 'teams',
                 key: 'id'
             },
             allowNull: false,
             unique: 'UK01'
-        }
+        },
+        team_id: DataTypes.INTEGER
     }, {
         underscored: true,
         underscoredAll: true
@@ -45,9 +36,9 @@ module.exports = (sequelize, DataTypes) => {
 
     // Class methods
 
-    contests_problems.associate = (models) => {
+    users_teams.associate = (models) => {
 
     }
 
-    return contests_problems;
+    return users_teams;
 };

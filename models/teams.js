@@ -4,23 +4,48 @@ const { Model } = require('sequelize');
 
 module.exports = (sequelize, DataTypes) => {
 
-    class teams extends Model {
-        /**
-         * Helper method for defining associations.
-         * This method is not a part of Sequelize lifecycle.
-         * The `models/index` file will call this method automatically.
-         */
-        static associate(models) {
-            // define association here
+    var teams = sequelize.define('teams', {
+        id: {
+            allowNull: false,
+            autoIncrement: true,
+            primaryKey: true,
+            type: DataTypes.INTEGER
+        },
+        name: {
+            allowNull: false,
+            type: DataTypes.STRING,
+            validate: {
+                len: {
+                    args: 3,
+                    msg: "El campo nombre no puede ser vacio."
+                }
+            }
+        },
+        total_submissions: {
+            type: DataTypes.INTEGER,
+            defaultValue: 0
+        },
+        accepted_submissions: {
+            type: DataTypes.INTEGER,
+            defaultValue: 0
         }
-    };
-    teams.init({
-        name: DataTypes.STRING,
-        total_submissions: DataTypes.INTEGER,
-        accepted_submissions: DataTypes.INTEGER
     }, {
-        sequelize,
-        modelName: 'teams',
+        underscored: true,
+        underscoredAll: true,
     });
+
+    teams.associate = (models) => {
+        teams.belongsToMany(models.users, {
+            through: 'users_teams',
+            as: 'users',
+            onDelete: 'CASCADE'
+        })
+
+        teams.belongsToMany(models.contests, {
+            through: 'contests_teams',
+            as: 'contests',
+            onDelete: 'CASCADE'
+        })
+    }
     return teams;
 };

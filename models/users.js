@@ -79,6 +79,22 @@ module.exports = function(sequelize, DataTypes) {
         socket_id: {
             type: DataTypes.STRING,
             allowNull: true
+        },
+        education_level: {
+            type: DataTypes.INTEGER,
+            allowNull: true
+        },
+        institution: {
+            type: DataTypes.STRING,
+            allowNull: true
+        },
+        profile_image_url: {
+            type: DataTypes.STRING,
+            allowNull: true
+        },
+        status_learning: {
+            type: DataTypes.INTEGER,
+            allowNull: true
         }
     }, {
         hooks: {
@@ -89,28 +105,45 @@ module.exports = function(sequelize, DataTypes) {
         underscoredAll: true,
     });
 
+    //Class methods
+
     Users.associate = (models) => {
-            Users.hasMany(models.problems, { as: 'problems' })
+        Users.hasMany(models.problems, { as: 'problems' })
 
-            Users.hasMany(models.materials, { as: 'materials' })
+        Users.hasMany(models.materials, { as: 'materials' })
 
-            Users.hasMany(models.submissions, { as: 'submissions' })
+        Users.hasMany(models.posts, { as: 'posts' })
 
-            Users.belongsToMany(models.syllabuses, {
-                through: 'syllabus_students',
-                as: 'syllabuses'
-            })
+        Users.hasMany(models.reports_forums, { as: 'reports_forums' })
 
-            Users.belongsToMany(models.contests, {
-                through: 'contests_students',
-                as: 'contests',
-                onDelete: 'CASCADE'
-            })
-        }
-        /**
-         * Hide passwords from queries
-         * @returns
-         */
+        Users.hasMany(models.forums, { as: 'forums' })
+
+        Users.hasMany(models.submissions, { as: 'submissions' })
+
+        Users.belongsToMany(models.syllabuses, {
+            through: 'syllabus_students',
+            as: 'syllabuses'
+        })
+
+        Users.belongsToMany(models.contests, {
+            through: 'contests_students',
+            as: 'contests',
+            onDelete: 'CASCADE'
+        })
+
+        Users.belongsToMany(models.teams, {
+            through: 'users_teams',
+            as: 'teams',
+            onDelete: 'CASCADE'
+        })
+    }
+
+    // Instance methods
+
+    /**
+     * Hide passwords from queries
+     * @returns
+     */
     Users.prototype.toJSON = function() {
         var values = Object.assign({}, this.get());
         delete values.password;
