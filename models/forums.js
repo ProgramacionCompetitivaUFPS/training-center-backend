@@ -27,11 +27,11 @@ module.exports = (sequelize, DataTypes) => {
             }
         },
         description: {
-            allowNull: true,
+            allowNull: false,
             type: DataTypes.TEXT
         },
         is_closed: {
-            allowNull: true,
+            allowNull: false,
             type: DataTypes.INTEGER
         },
         status_view: {
@@ -43,6 +43,7 @@ module.exports = (sequelize, DataTypes) => {
     forums.associate = function(models) {
 
         forums.belongsTo(models.users)
+        forums.hasOne(forums, { as: 'root_id_forum', foreignKey: 'id' })
 
     }
 

@@ -40,6 +40,18 @@ module.exports = {
                 type: Sequelize.STRING,
                 unique: true
             },
+            socket_id: {
+                allowNull: true,
+                type: Sequelize.STRING
+            },
+            created_at: {
+                allowNull: false,
+                type: Sequelize.DATE
+            },
+            updated_at: {
+                allowNull: false,
+                type: Sequelize.DATE
+            },
             education_level: {
                 type: Sequelize.INTEGER,
                 allowNull: true
@@ -56,14 +68,6 @@ module.exports = {
                 type: Sequelize.INTEGER,
                 allowNull: true
             },
-            created_at: {
-                allowNull: false,
-                type: Sequelize.DATE
-            },
-            updated_at: {
-                allowNull: false,
-                type: Sequelize.DATE
-            }
         });
 
     },

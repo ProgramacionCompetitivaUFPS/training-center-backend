@@ -28,9 +28,21 @@ module.exports = {
                 allowNull: true,
                 type: Sequelize.TEXT
             },
-            type: {
+            user_id: {
+                allowNull: false,
+                type: Sequelize.INTEGER,
+                references: {
+                    model: 'users',
+                    key: 'id'
+                }
+            },
+            public: {
+                allowNull: false,
+                type: Sequelize.BOOLEAN
+            },
+            key: {
                 allowNull: true,
-                type: Sequelize.INTEGER
+                type: Sequelize.STRING
             },
             created_at: {
                 allowNull: false,
@@ -40,14 +52,11 @@ module.exports = {
                 allowNull: false,
                 type: Sequelize.DATE
             },
-            user_id: {
+            type: {
                 allowNull: false,
                 type: Sequelize.INTEGER,
-                references: {
-                    model: 'users',
-                    key: 'id'
-                }
-            }
+                defaultValue: 0
+            },
         });
     },
     down: (queryInterface, Sequelize) => {

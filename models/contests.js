@@ -51,8 +51,9 @@ module.exports = (sequelize, DataTypes) => {
             }
         },
         type: {
-            allowNull: true,
-            type: DataTypes.INTEGER
+            allowNull: false,
+            type: DataTypes.INTEGER,
+            defaultValue: 0
         }
     }, {
         underscored: true,

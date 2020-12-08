@@ -17,8 +17,9 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.TEXT
         },
         type: {
-            allowNull: false,
-            type: DataTypes.INTEGER
+            allowNull: true,
+            type: DataTypes.INTEGER,
+            defaultValue: 0
         },
         user_id: {
             allowNull: true,

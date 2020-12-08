@@ -16,10 +16,6 @@ module.exports = {
                 allowNull: false,
                 type: Sequelize.TEXT
             },
-            type: {
-                allowNull: false,
-                type: Sequelize.INTEGER
-            },
             user_id: {
                 allowNull: true,
                 type: Sequelize.INTEGER,
@@ -43,7 +39,12 @@ module.exports = {
             updated_at: {
                 allowNull: false,
                 type: Sequelize.DATE
-            }
+            },
+            type: {
+                allowNull: false,
+                type: Sequelize.INTEGER,
+                defaultValue: 0
+            },
         });
     },
     down: (queryInterface, Sequelize) => {

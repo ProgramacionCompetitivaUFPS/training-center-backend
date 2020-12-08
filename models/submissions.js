@@ -24,7 +24,9 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: false
         },
         user_team_id: {
-            type: DataTypes.INTEGER
+            type: DataTypes.INTEGER,
+            allowNull: true,
+            defaultValue: 0
         },
         file_name: {
             allowNull: false,

@@ -20,10 +20,6 @@ module.exports = {
                 type: Sequelize.STRING,
                 unique: true
             },
-            type: {
-                allowNull: false,
-                type: Sequelize.INTEGER
-            },
             created_at: {
                 allowNull: false,
                 type: Sequelize.DATE
@@ -31,7 +27,12 @@ module.exports = {
             updated_at: {
                 allowNull: false,
                 type: Sequelize.DATE
-            }
+            },
+            type: {
+                allowNull: false,
+                type: Sequelize.INTEGER,
+                defaultValue: 1
+            },
         });
     },
 

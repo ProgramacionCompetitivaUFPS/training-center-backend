@@ -48,14 +48,6 @@ module.exports = {
                 allowNull: false,
                 type: Sequelize.TEXT
             },
-            visibility: {
-                allowNull: true,
-                type: Sequelize.INTEGER
-            },
-            solution_url: {
-                allowNull: true,
-                type: Sequelize.STRING
-            },
             description_es: {
                 allowNull: true,
                 type: Sequelize.TEXT
@@ -83,7 +75,15 @@ module.exports = {
                     model: 'users',
                     key: 'id'
                 }
-            }
+            },
+            visibility: {
+                allowNull: true,
+                type: Sequelize.INTEGER
+            },
+            solution_url: {
+                allowNull: true,
+                type: Sequelize.STRING
+            },
         });
     },
     down: function(queryInterface, Sequelize) {

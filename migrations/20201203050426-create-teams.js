@@ -12,10 +12,12 @@ module.exports = {
                 type: Sequelize.STRING
             },
             total_submissions: {
-                type: Sequelize.INTEGER
+                type: Sequelize.INTEGER,
+                defaultValue: 0
             },
             accepted_submissions: {
-                type: Sequelize.INTEGER
+                type: Sequelize.INTEGER,
+                defaultValue: 0
             },
             created_at: {
                 allowNull: false,

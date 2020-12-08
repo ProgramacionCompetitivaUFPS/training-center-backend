@@ -24,9 +24,6 @@ module.exports = {
                 },
                 allowNull: false
             },
-            user_team_id: {
-                type: Sequelize.INTEGER
-            },
             file_name: {
                 allowNull: false,
                 type: Sequelize.STRING
@@ -52,8 +49,9 @@ module.exports = {
                 type: Sequelize.STRING
             },
             user_team_id: {
-                allowNull: false,
-                type: Sequelize.INTEGER
+                allowNull: true,
+                type: Sequelize.INTEGE,
+                defaultValue: 0
             },
             assignment_problem_id: {
                 type: Sequelize.INTEGER,
@@ -78,7 +76,11 @@ module.exports = {
             updated_at: {
                 allowNull: false,
                 type: Sequelize.DATE
-            }
+            },
+            user_team_id: {
+                type: Sequelize.INTEGER,
+                allowNull: true
+            },
         });
     },
     down: (queryInterface, Sequelize) => {

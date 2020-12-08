@@ -40,13 +40,6 @@ module.exports = {
                 allowNull: false,
                 type: Sequelize.BOOLEAN
             },
-            type: {
-                allowNull: false,
-                type: Sequelize.INTEGER
-            },
-            body: {
-                type: Sequelize.TEXT
-            },
             created_at: {
                 allowNull: false,
                 type: Sequelize.DATE
@@ -54,7 +47,20 @@ module.exports = {
             updated_at: {
                 allowNull: false,
                 type: Sequelize.DATE
-            }
+            },
+            type: {
+                allowNull: true,
+                type: Sequelize.INTEGER,
+                defaultValue: 0
+            },
+            body: {
+                allowNull: true,
+                type: Sequelize.TEXT
+            },
+            level: {
+                allowNull: true,
+                type: Sequelize.STRING,
+            },
         });
     },
     down: (queryInterface, Sequelize) => {

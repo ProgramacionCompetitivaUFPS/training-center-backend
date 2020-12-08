@@ -52,8 +52,10 @@ module.exports = (sequelize, DataTypes) => {
         type: {
             allowNull: false,
             type: DataTypes.INTEGER,
+            defaultValue: 0
         },
         body: {
+            allowNull: true,
             type: DataTypes.TEXT,
         },
         user_id: {
@@ -63,7 +65,11 @@ module.exports = (sequelize, DataTypes) => {
                 model: 'users',
                 key: 'id'
             }
-        }
+        },
+        level: {
+            allowNull: true,
+            type: DataTypes.STRING,
+        },
     }, {
         underscored: true,
         underscoredAll: true
