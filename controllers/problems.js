@@ -19,8 +19,8 @@ function create(req, res) {
 
     req.body = req.body.data
 
-    if ( (!req.body.title_es && !req.body.title_en) || (!req.body.description_en && !req.body.description_es)
-        || !req.body.category || !req.body.level || !req.body.example_input || !req.body.example_output || !req.body.time_limit) {
+    if ((!req.body.title_es && !req.body.title_en) || (!req.body.description_en && !req.body.description_es) ||
+        !req.body.category || !req.body.level || !req.body.example_input || !req.body.example_output || !req.body.time_limit) {
         return res.status(400).send({ error: 'Datos incompletos' })
     }
 
@@ -29,7 +29,7 @@ function create(req, res) {
     req.body.output = req.files['output'][0].path
     req.body.user_id = req.user.sub
 
-    Problem.create( req.body )
+    Problem.create(req.body)
         .then(problem => {
             return res.sendStatus(201)
         })
@@ -76,8 +76,7 @@ function findFiles(req, res, condition) {
 
 function makeUpdate(req, res, condition) {
     Problem.update(
-        req.body,
-        {
+        req.body, {
             where: condition
         }
     ).then((affectedRows) => {
@@ -108,38 +107,39 @@ function remove(req, res) {
     }
 
     Problem.destroy({
-        where: condition
-    })
-        .then(function (deletedRecords) {
+            where: condition
+        })
+        .then(function(deletedRecords) {
             if (deletedRecords) return res.status(200).json(deletedRecords);
             return res.status(401).send({ error: 'No se encuentra autorizado' })
         })
-        .catch(function (error) {
+        .catch(function(error) {
             return res.status(500).json(error);
         });
 }
 
 function get(req, res) {
     Problem.findOne({
-        where: {
-            id: req.params.id
-        },
-        include: [ 
-            { model: User, attributes: ['name', 'id', 'username', 'email'] },
-            { 
-                model: Submission, 
-                as: 'submissions',
-                attributes: ['user_id'],
-                where: {
-                    user_id: req.user.sub,
-                    verdict: 'Accepted'
-                },
-                required: false
-            } 
-        ],
-        attributes: ['id', 'title_es', 'title_en', 'level', 'description_en', 'description_es',
-            'example_input', 'example_output', 'category_id', 'user_id', 'time_limit']
-    })
+            where: {
+                id: req.params.id
+            },
+            include: [
+                { model: User, attributes: ['name', 'id', 'username', 'email'] },
+                {
+                    model: Submission,
+                    as: 'submissions',
+                    attributes: ['user_id'],
+                    where: {
+                        user_id: req.user.sub,
+                        verdict: 'Accepted'
+                    },
+                    required: false
+                }
+            ],
+            attributes: ['id', 'title_es', 'title_en', 'level', 'description_en', 'description_es',
+                'example_input', 'example_output', 'category_id', 'user_id', 'time_limit'
+            ]
+        })
         .then((problem) => {
             return res.status(200).send({ problem })
         })
@@ -151,14 +151,14 @@ function get(req, res) {
 function list(req, res) {
     let limit = (req.query.limit) ? parseInt(req.query.limit) : 10
     let order = []
-    let offset = (req.query.page) ? limit * ( parseInt(req.query.page) - 1 ) : 0
+    let offset = (req.query.page) ? limit * (parseInt(req.query.page) - 1) : 0
     let by = (req.query.by) ? req.query.by : 'ASC'
 
     let condition = {}
     let meta = {}
 
     // Barra de búsqueda o búsqueda de problemas por categoria 
-    if( req.params.id ) {
+    if (req.params.id) {
         condition.category_id = req.params.id
         if (req.query.filter) {
             if (req.query.filter == 'en') {
@@ -171,7 +171,7 @@ function list(req, res) {
                 }
             }
         }
-    } else if( !req.query.search )
+    } else if (!req.query.search)
         return res.status(400).send({ error: 'No se ha proporcionado un termino para buscar' })
     else {
         req.query.search = '%' + req.query.search + '%'
@@ -195,7 +195,7 @@ function list(req, res) {
                     { description_es: { $like: req.query.search } },
                 ]
             }
-        }else{
+        } else {
             condition.$or = [
                 { title_en: { $like: req.query.search } },
                 { title_es: { $like: req.query.search } },
@@ -214,37 +214,35 @@ function list(req, res) {
             order[0] = ['level', by]
     } else order[0] = ['id', by]
 
-    if( req.params.id ){
-        Category.findById(req.params.id).then( category => {
-            if( !category ) return res.sendStatus(404)
-    
+    if (req.params.id) {
+        Category.findByPk(req.params.id).then(category => {
+            if (!category) return res.sendStatus(404)
+
             meta.categoryName = category.name
-    
+
             Problem.findAndCountAll({
                 where: condition,
                 distinct: 'id',
                 attributes: ['id', 'title_es', 'title_en', 'level', 'user_id'],
-                include: [ 
-                    { 
-                        model: Submission, 
-                        as: 'submissions',
-                        attributes: ['user_id'],
-                        where: {
-                            user_id: req.user.sub,
-                            verdict: 'Accepted'
-                        },
-                        required: false
-                    }
-                ],
+                include: [{
+                    model: Submission,
+                    as: 'submissions',
+                    attributes: ['user_id'],
+                    where: {
+                        user_id: req.user.sub,
+                        verdict: 'Accepted'
+                    },
+                    required: false
+                }],
                 limit: limit,
                 order: order,
                 offset: offset,
             }).then((response) => {
-                meta.totalPages = Math.ceil( response.count / limit )
+                meta.totalPages = Math.ceil(response.count / limit)
                 meta.totalItems = response.count
-    
-                if ( offset >= response.count ) {
-                    return res.status(200).send( { meta } )
+
+                if (offset >= response.count) {
+                    return res.status(200).send({ meta })
                 }
                 res.status(200).send({ meta: meta, data: response.rows })
             })
@@ -257,26 +255,24 @@ function list(req, res) {
             distinct: 'id',
             attributes: ['id', 'title_es', 'title_en', 'level', 'user_id'],
             limit: limit,
-            include: [ 
-                { 
-                    model: Submission, 
-                    as: 'submissions',
-                    attributes: ['user_id'],
-                    where: {
-                        user_id: req.user.sub,
-                        verdict: 'Accepted'
-                    },
-                    required: false
-                }
-            ],
+            include: [{
+                model: Submission,
+                as: 'submissions',
+                attributes: ['user_id'],
+                where: {
+                    user_id: req.user.sub,
+                    verdict: 'Accepted'
+                },
+                required: false
+            }],
             order: order,
             offset: offset,
         }).then((response) => {
-            meta.totalPages = Math.ceil( response.count / limit )
+            meta.totalPages = Math.ceil(response.count / limit)
             meta.totalItems = response.count
 
-            if ( offset >= response.count ) {
-                return res.status(200).send( { meta } )
+            if (offset >= response.count) {
+                return res.status(200).send({ meta })
             }
             res.status(200).send({ meta: meta, data: response.rows })
         }).catch((err) => {
@@ -291,9 +287,9 @@ function submit(req, res) {
 
     req.body = req.body.data
 
-    if( !req.files['code'] || !req.body.language )
+    if (!req.files['code'] || !req.body.language)
         return res.status(400).send({ error: 'Datos incompletos' })
-    
+
     req.body.user_id = req.user.sub
     req.body.problem_id = req.params.id
     req.body.file_name = req.files['code'][0].filename
@@ -301,11 +297,11 @@ function submit(req, res) {
     req.body.status = 'in queue'
 
     let isContest = false
-    if( req.body.contest_problem_id ) isContest = true
+    if (req.body.contest_problem_id) isContest = true
 
-    Submission.create( req.body )
+    Submission.create(req.body)
         .then(submission => {
-            Grader.judge( submission.id, isContest )
+            Grader.judge(submission.id, isContest)
             return res.status(200).send(submission)
         })
         .catch(error => {

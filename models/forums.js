@@ -43,7 +43,7 @@ module.exports = (sequelize, DataTypes) => {
     forums.associate = function(models) {
 
         forums.belongsTo(models.users)
-        forums.hasOne(forums, { as: 'root_id_forum', foreignKey: 'id' })
+        forums.hasOne(forums, { as: 'forums', foreignKey: 'id' })
 
     }
 
