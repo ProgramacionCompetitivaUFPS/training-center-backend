@@ -86,7 +86,7 @@ function update(req, res) {
 
     req.body.user_id = req.user.sub
 
-    Contest.findById(req.params.id).then(contest => {
+    Contest.findByPk(req.params.id).then(contest => {
         let init_date = moment(contest.init_date)
         let end_date = moment(contest.end_date)
 
@@ -114,7 +114,7 @@ function update(req, res) {
 }
 
 function remove(req, res) {
-    Contest.findById(req.params.id).then(contest => {
+    Contest.findByPk(req.params.id).then(contest => {
         if (contest == null)
             return res.sendStatus(404)
 
@@ -178,7 +178,7 @@ function addProblems(req, res) {
     if (!req.body.problems)
         return res.status(400).send({ error: 'Datos incompletos' })
 
-    Contest.findById(req.params.id)
+    Contest.findByPk(req.params.id)
         .then((contest) => {
             if (contest == null)
                 return res.sendStatus(404)
@@ -206,7 +206,7 @@ function removeProblems(req, res) {
     if (!req.body.problems)
         return res.status(400).send({ error: 'Datos incompletos' })
 
-    Contest.findById(req.params.id)
+    Contest.findByPk(req.params.id)
         .then((contest) => {
             if (contest == null)
                 return res.sendStatus(404)
@@ -234,7 +234,7 @@ function registerStudent(req, res) {
     if (req.user.usertype != 0)
         return res.status(401).send({ error: 'No se encuentra autorizado' })
 
-    Contest.findById(req.params.id)
+    Contest.findByPk(req.params.id)
         .then((contest) => {
             if (contest == null)
                 return res.sendStatus(404)
@@ -265,7 +265,7 @@ function removeStudent(req, res) {
     if (req.user.usertype != 0)
         return res.status(401).send({ error: 'No se encuentra autorizado' })
 
-    Contest.findById(req.params.id)
+    Contest.findByPk(req.params.id)
         .then((contest) => {
             if (contest == null)
                 return res.sendStatus(404)

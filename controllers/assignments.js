@@ -121,7 +121,7 @@ function addProblems(req, res) {
     if (!req.body.problems)
         return res.status(400).send({ error: 'Datos incompletos' })
 
-    Assignment.findById(req.params.id)
+    Assignment.findByPk(req.params.id)
         .then((assignment) => {
             assignment.addProblems(req.body.problems).then((problems) => {
                 return res.sendStatus(201)
@@ -140,7 +140,7 @@ function deleteProblems(req, res) {
     if (!req.body.problems)
         return res.status(400).send({ error: 'Datos incompletos' })
 
-    Assignment.findById(req.params.id)
+    Assignment.findByPk(req.params.id)
         .then((assignment) => {
             assignment.removeProblems(req.body.problems).then((problems) => {
                 return res.sendStatus(201)

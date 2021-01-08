@@ -8,6 +8,9 @@ const Grader = require('../controllers/grader')
 const _ = require('lodash')
 const files = require('../services/files')
 
+const Sequelize = require('sequelize')
+const Op = Sequelize.Op
+
 /**
  * Problems controller 
  */
@@ -64,7 +67,7 @@ function update(req, res) {
 }
 
 function findFiles(req, res, condition) {
-    Problem.findById(req.params.id).then(problem => {
+    Problem.findByPk(req.params.id).then(problem => {
         if (req.files['input']) req.body.oldInput = problem.input
         if (req.files['output']) req.body.oldOutput = problem.output
 
@@ -163,44 +166,75 @@ function list(req, res) {
         if (req.query.filter) {
             if (req.query.filter == 'en') {
                 condition.title_en = {
-                    $ne: null
+                    [Op.ne]: null
                 }
             } else {
+
                 condition.title_es = {
-                    $ne: null
+                    [Op.ne]: null
                 }
             }
         }
     } else if (!req.query.search)
         return res.status(400).send({ error: 'No se ha proporcionado un termino para buscar' })
     else {
+
         req.query.search = '%' + req.query.search + '%'
         if (req.query.filter) {
             if (req.query.filter == 'en') {
                 condition.title_en = {
-                    $ne: null
+                    [Op.ne]: null
                 }
 
-                condition.$or = [
-                    { title_en: { $like: req.query.search } },
-                    { description_en: { $like: req.query.search } }
+                condition[Op.or] = [{
+                        title_en: {
+                            [Op.like]: req.query.search
+                        }
+                    },
+                    {
+                        description_en: {
+                            [Op.like]: req.query.search
+                        }
+                    }
                 ]
             } else {
                 condition.title_es = {
-                    $ne: null
+                    [Op.ne]: null
                 }
 
-                condition.$or = [
-                    { title_es: { $like: req.query.search } },
-                    { description_es: { $like: req.query.search } },
+                condition[Op.or] = [{
+                        title_es: {
+                            [Op.like]: req.query.search
+                        }
+                    },
+                    {
+                        description_es: {
+                            [Op.like]: req.query.search
+                        }
+                    },
                 ]
             }
         } else {
-            condition.$or = [
-                { title_en: { $like: req.query.search } },
-                { title_es: { $like: req.query.search } },
-                { description_en: { $like: req.query.search } },
-                { description_es: { $like: req.query.search } },
+            condition[Op.or] = [{
+                    title_en: {
+                        [Op.like]: req.query.search
+                    }
+                },
+                {
+                    title_es: {
+                        [Op.like]: req.query.search
+                    }
+                },
+                {
+                    description_en: {
+                        [Op.like]: req.query.search
+                    }
+                },
+                {
+                    description_es: {
+                        [Op.like]: req.query.search
+                    }
+                },
             ]
         }
     }
@@ -250,6 +284,7 @@ function list(req, res) {
             res.sendStatus(500)
         })
     } else {
+
         Problem.findAndCountAll({
             where: condition,
             distinct: 'id',

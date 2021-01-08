@@ -165,7 +165,7 @@ function assignMaterialsToSyllabus(req, res) {
     if (!req.body.materials)
         return res.status(400).send({ error: 'Datos incompletos' })
 
-    Syllabus.findById(req.params.id)
+    Syllabus.findByPk(req.params.id)
         .then((syllabus) => {
             if (req.user.sub != syllabus.user_id)
                 return res.status(401).send({ error: 'No se encuentra autorizado' })
@@ -188,7 +188,7 @@ function removeMaterialsFromSyllabus(req, res) {
     if (!req.body.materials)
         return res.status(400).send({ error: 'Datos incompletos' })
 
-    Syllabus.findById(req.params.id)
+    Syllabus.findByPk(req.params.id)
         .then((syllabus) => {
             if (req.user.sub != syllabus.user_id)
                 return res.status(401).send({ error: 'No se encuentra autorizado' })
@@ -230,7 +230,7 @@ function registerStudent(req, res) {
     if (req.user.usertype != 0)
         return res.status(401).send({ error: 'No se encuentra autorizado' })
 
-    Syllabus.findById(req.params.id)
+    Syllabus.findByPk(req.params.id)
         .then((syllabus) => {
             if (!syllabus.public && !req.body.key)
                 return res.status(400).send({ error: 'Datos incompletos' })
@@ -253,7 +253,7 @@ function removeStudents(req, res) {
     if (req.user.usertype == 2)
         return res.status(401).send({ error: 'No se encuentra autorizado' })
 
-    Syllabus.findById(req.params.id)
+    Syllabus.findByPk(req.params.id)
         .then((syllabus) => {
             if (req.user.usertype == 1 && req.user.sub != syllabus.user_id)
                 return res.status(401).send({ error: 'No se encuentra autorizado' })
