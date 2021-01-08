@@ -16,7 +16,6 @@ const moment = require('moment')
  * @param {any} res
  */
 function signIn(req, res) {
-    console.log("holii")
     console.log(req)
     if (!req.body.email || !req.body.password) {
         res.status(400).send({ error: 'Datos incompletos' })

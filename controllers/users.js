@@ -211,13 +211,19 @@ function changePassword(req, res) {
 }
 
 function getSyllabus(req, res) {
+
     User.findOne({
-        where: { id: req.params.id },
+        where: {
+            id: req.params.id
+        },
         attributes: ['id'],
         include: [{
             model: Syllabus,
             as: 'syllabuses',
             attributes: ['id'],
+            where: {
+                type: req.query.type
+            },
             through: { attributes: [] }
         }]
     }).then((ans) => {

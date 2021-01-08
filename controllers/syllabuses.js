@@ -84,6 +84,10 @@ function list(req, res) {
         else condition.public = true
     }
 
+    if (req.query.type) {
+        condition.type = req.query.type
+    }
+
     Syllabus.findAndCountAll({
         where: condition,
         include: [{
