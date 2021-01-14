@@ -2,13 +2,13 @@
     "name": "ufps-training-center",
     "version": "1.0.0",
     "private": true,
-    "description": "Trainig Center - Grupo de Estudio en Programación Competitiva UFPS",
+    "description": "Training Center - Grupo de Estudio en Programación Competitiva UFPS",
     "engines": {
         "node": ">=6.9.4"
     },
     "scripts": {
         "start": "node ./bin/www",
-        "dev": "./node_modules/nodemon/bin/nodemon.js ./bin/www"
+        "dev": "nodemon ./bin/www"
     },
     "repository": {
         "type": "git",
