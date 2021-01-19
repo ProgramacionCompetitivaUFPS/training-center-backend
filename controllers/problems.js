@@ -345,11 +345,19 @@ function submit(req, res) {
         })
 }
 
+function validateCategory(req, res){
+    console.log(req.params.id) //id problem
+    //voy aca, falta validar lo mismo en la vista de school view problem
+    //consultar problema -> extraer idcategory -> consultar category -> extraer typecategory
+    return true
+}
+
 module.exports = {
     create,
     update,
     remove,
     list,
     get,
-    submit
+    submit,
+    validateCategory
 }
