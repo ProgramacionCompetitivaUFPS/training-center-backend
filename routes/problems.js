@@ -31,7 +31,7 @@ var submissionUpload = submission.fields([
  */
 
 problems.get('/:id', auth.isAuth, problemsCtrl.get )
-//problems.get('/:id/validateCategory', auth.isAuth, problemsCtrl.validateCategory )
+problems.get('/:id/validateCategory', auth.isAuth, problemsCtrl.validateCategory )
 problems.get('/', auth.isAuth, problemsCtrl.list )
 problems.post('/:id/submit', auth.isAuth, submissionUpload, problemsCtrl.submit )
 problems.post('/', auth.isAuth, problemUpload, problemsCtrl.create )

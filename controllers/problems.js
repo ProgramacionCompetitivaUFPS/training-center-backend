@@ -345,12 +345,36 @@ function submit(req, res) {
         })
 }
 
-/*function validateCategory(req, res){
-    console.log(req.params.id) //id problem
+function validateCategory(req, res){
+
+    //console.log(req.params.id) //id problem
     //voy aca, falta validar lo mismo en la vista de school view problem
     //consultar problema -> extraer idcategory -> consultar category -> extraer typecategory
+
+    Category.findOne({
+        attributes: [
+            'type'
+        ],
+        include: [
+            {
+                model: Problem,
+                as: 'problems',
+                attributes: ['id', 'category_id'],
+                where: {
+                    id: req.params.id,
+                }
+            }
+        ]
+    })
+        .then((category) => {
+            return res.status(200).send({ type: category.type })
+        })
+        .catch((err) => {
+            return res.status(500).send({ error: `${err}` })
+        })
+
     return true
-}*/
+}
 
 module.exports = {
     create,
