@@ -13,7 +13,7 @@ var multer_storage = multer.diskStorage({
 
         if (file.fieldname == 'pdf') d = 'materials'
 
-        if (file.fieldname == 'code') d = 'codes'
+        if (file.fieldname == 'code' || file.fieldname == 'XMLCode') d = 'codes'
 
         cb(null, path.join(__dirname, `../files/${d}`) )
     },
@@ -56,9 +56,17 @@ var materialsDataFilter = function (req, file, cb) {
 var submissionsDataFilter = function (req, file, cb) {
     let ext = path.extname( file.originalname );
     
-    if ( ext !== '.cpp' && ext !== '.cc' && ext !== '.cxx' && ext !== '.c' && ext !== '.cp' && ext !== '.java' && ext !== '.py'  ) {
-        return cb( new Error('Sólo estan permitidos archivos .cpp, .java y .py') )
+    if(file.fieldname == 'XMLCode'){
+        if(ext !== '.xml'){
+            return cb( new Error('Solo se permite la carga de archivos .xml para soluciones en Blockly') )
+        }
+    }else if(file.fieldname == 'code'){
+        if( ext !== '.cpp' && ext !== '.cc' && ext !== '.cxx' && ext !== '.c' && ext !== '.cp' && ext !== '.java' && ext !== '.py') {
+
+            return cb( new Error('Sólo estan permitidos archivos .cpp, .java y .py') )
+        }
     }
+
     cb(null, true)
 }
 

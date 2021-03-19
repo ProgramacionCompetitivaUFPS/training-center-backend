@@ -1,5 +1,5 @@
 #!/bin/bash
-time timeout {TL}s python {path}{code} < {input} > {path}output.out -k
+time timeout {TL}s python3 {path}{code} < {input} > {path}output.out -k
 exit_status=$?
 if [[ $exit_status -eq 124 ]]; then
     echo "Timelimit"

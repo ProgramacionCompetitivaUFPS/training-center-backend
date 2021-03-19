@@ -20,6 +20,9 @@ class Sandbox {
     this.execution_directory = path.join( this.path, 'files', folder )
     this.config = new Config()
 
+    console.log("***************NEW SANDBOX ****************")
+    console.log(this)
+
     this.configureLanguage()
   }
 
@@ -37,29 +40,38 @@ class Sandbox {
   }
   
   run (success) {
+
     this.setUpEnvironment(() => {
       this.execute(success)
     })
   }
 
   setUpEnvironment (success) {
-    exec(
-      'mkdir ' + this.execution_directory + /* Crea la carpeta temporal */
-      ' && cp ' + path.join(__dirname, 'util', this.runner) + ' ' + this.execution_directory + /* Copia los scripts al directorio */
-      ' && chmod 777 ' + this.execution_directory + /* Asigna permisos a los scripts */
-      ' && cp ' + path.join(this.path, this.input) + ' ' + this.execution_directory + /* Copia el input del problema */
-      ' && cp ' + path.join(this.path, this.output) + ' ' + this.execution_directory + /* Copia el output del problema */
-      ' && cp ' + path.join(this.path, this.file_path) + ' ' + this.execution_directory + /* Copia el source del usuario */
-      ' && mv ' + this.execution_directory + '/' + this.file_name + ' ' + this.execution_directory + '/' + this.fileName + /* Renombrar el fuente para poderlo ejecutar */
-      " && sed -i 's/{TL}/" + this.timeLimit + "/g' " + this.execution_directory + '/' + this.runner + /* Reemplazo del TL en el script de shell  */
-      " && sed -i 's/{path}/\\/files\\/" + this.folder + '\\/' + "/g' " + this.execution_directory + '/' + this.runner + /* Reemplazo del path del archivo a ejecutar en el script de shell  */
-      " && sed -i 's/{code}/" + this.executionFile + "/g' " + this.execution_directory + '/' + this.runner + /* Reemplazo del archivo a ejecutar en el script de shell  */
-      " && sed -i 's/{input}/\\/files\\/" + this.folder + '\\/' + this.input_filename + "/g' " + this.execution_directory + '/' + this.runner + /* Reemplazo del archivo de entradas en el script de shell  */
-      " && sed -i 's/{folder}/" + this.folder + "/g' " + this.execution_directory + '/' + this.runner /* Reemplazo de la carpeta en el script de shell  */
-      , (error, stdout, stderr) => {
+
+    let script = 'mkdir ' + this.execution_directory + /* Crea la carpeta temporal */
+
+    ' && cp ' + path.join(__dirname, 'util', this.runner) + ' ' + this.execution_directory + /* Copia los scripts al directorio */
+
+    ' && chmod 777 ' + this.execution_directory + /* Asigna permisos a los scripts */
+
+    ' && cp ' + path.join(this.path, this.input) + ' ' + this.execution_directory + /* Copia el input del problema */
+    ' && cp ' + path.join(this.path, this.output) + ' ' + this.execution_directory + /* Copia el output del problema */
+    ' && cp ' + path.join(this.path, this.file_path) + ' ' + this.execution_directory + /* Copia el source del usuario */
+    ' && mv ' + this.execution_directory + '/' + this.file_name + ' ' + this.execution_directory + '/' + this.fileName + /* Renombrar el fuente para poderlo ejecutar */
+    " && sed -i 's/{TL}/" + this.timeLimit + "/g' " + this.execution_directory + '/' + this.runner + /* Reemplazo del TL en el script de shell  */
+    " && sed -i 's/{path}/\\/files\\/" + this.folder + '\\/' + "/g' " + this.execution_directory + '/' + this.runner + /* Reemplazo del path del archivo a ejecutar en el script de shell  */
+    " && sed -i 's/{code}/" + this.executionFile + "/g' " + this.execution_directory + '/' + this.runner + /* Reemplazo del archivo a ejecutar en el script de shell  */
+    " && sed -i 's/{input}/\\/files\\/" + this.folder + '\\/' + this.input_filename + "/g' " + this.execution_directory + '/' + this.runner + /* Reemplazo del archivo de entradas en el script de shell  */
+    " && sed -i 's/{folder}/" + this.folder + "/g' " + this.execution_directory + '/' + this.runner /* Reemplazo de la carpeta en el script de shell  */
+
+    console.log("*********PREPARAR ARCHIVOS: ************")
+    console.log(script)
+
+    exec(script, (error, stdout, stderr) => {
             if (error) {
+                console.log("*************    HAN OCURRIDO ERRORES  *************")
                 console.log( stderr )
-                this.removeExecutionFolder()
+                //this.removeExecutionFolder()
             } else success()
         }
     )
@@ -81,7 +93,9 @@ class Sandbox {
     let container = this.config.containers[this.languageId]
     let ins = 'docker exec ' + container + ' ' + compiler
 
-    //console.log( ins )
+    console.log("**************** INSTRUCCION ****************")
+    console.log(ins)
+
     exec(ins, (error, stdout, stderr) => {
       if (error) {
         console.log(error)
@@ -105,10 +119,10 @@ class Sandbox {
 
         if (ans === 'Timelimit') {
           success('Time Limit Exceeded', this.timeLimit)
-          this.removeExecutionFolder()
+          //this.removeExecutionFolder()
         } else if (ans === 'Runtime') {
           success('Runtime Error', execTime)
-          this.removeExecutionFolder()
+          //this.removeExecutionFolder()
         } else this.validateOutput(execTime, success)
       })
     })
@@ -118,7 +132,7 @@ class Sandbox {
     exec('diff ' + path.join(this.execution_directory, 'output.out') + ' ' + path.join(this.execution_directory, this.output_filename), (error, stdout, stderr) => {
       if (error) success('Wrong Answer', execTime)
       else success('Accepted', execTime)
-      this.removeExecutionFolder()
+      //this.removeExecutionFolder()
     })
   }
 

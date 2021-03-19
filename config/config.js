@@ -4,18 +4,15 @@ env('.env')
 module.exports = {
     development: {
         url: process.env.DATABASE_URL,
-        dialect: 'mysql',
-        logging: false
+        dialect: 'mysql'
     },
     production: {
         url: process.env.DATABASE_URL,
-        dialect: 'mysql',
-        logging: false
+        dialect: 'mysql'
     },
     test: {
         url: '',
-        dialect: "mysql",
-        logging: false
+        dialect: "mysql"
     },
     SECRET_TOKEN: process.env.SECRET_TOKEN,
 

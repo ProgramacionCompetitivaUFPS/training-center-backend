@@ -322,6 +322,9 @@ function submit(req, res) {
 
     req.body = req.body.data
 
+    console.log("************** INFORMACION DE LOS ARCHIVOS *****************");
+    console.log(req.files)
+
     if (!req.files['code'] || !req.body.language)
         return res.status(400).send({ error: 'Datos incompletos' })
 
@@ -346,10 +349,6 @@ function submit(req, res) {
 }
 
 function validateCategory(req, res){
-
-    //console.log(req.params.id) //id problem
-    //voy aca, falta validar lo mismo en la vista de school view problem
-    //consultar problema -> extraer idcategory -> consultar category -> extraer typecategory
 
     Category.findOne({
         attributes: [

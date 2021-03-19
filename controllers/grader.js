@@ -15,17 +15,24 @@ const socket = require('../services/socketsApi')
 function judge( submission_id, contest ) {
     getSubmissionData( submission_id, (res) =>{
         let data = res
+
+        console.log(data)
         
         getProblemData( data, () => {
             //url de la ruta donde se almaceno el archivo desde /files
             var n = data.file_path.indexOf('/files')
+
+            console.log("n para file path ", n, data.file_path)
             let file_path = data.file_path.substring(n, data.file_path.length )
+
             //url de la ruta donde esta el input desde /files
             n = data.input.indexOf('/files')
             let input_path = data.input.substring(n, data.input.length )
+
             //url de la ruta donde esta el output desde /files
             n = data.output.indexOf('/files')
             let output_path = data.output.substring(n, data.output.length )
+
             //Directorio temporal de la ejecución
             let folder = crypto.randomBytes(24).toString('hex')
             let input_filename = path.basename( data.input )
@@ -55,6 +62,9 @@ function judge( submission_id, contest ) {
                             execution_time: executionTime,
                             verdict: verdict
                         }
+                        console.log("********** VEREDICTO ************")
+                        console.log(ans)
+                        
                         updateStatus( submission_id, ans )
                         //user, problem, verdict, sumission_id
                         if( contest ) socket.refreshScoreboard( data.user_id, data.problem_id, ans.verdict, submission_id, data.problem_title, data.created_at )

@@ -17,14 +17,16 @@ var problemUpload = upload.fields([
     { name: 'output', maxCount: 1 }
 ])
 
-var submission = multer({
+var submissionCode = multer({
     storage: uploader.multer_storage,
     fileFilter: uploader.submissionsDataFilter
 })
 
-var submissionUpload = submission.fields([
-    { name: 'code', maxCount: 1 }
+var submissionUploadCode = submissionCode.fields([
+    { name: 'code', maxCount: 1 },
+    { name: 'XMLCode', maxCount: 1 }
 ])
+
 
 /**
  * Handler for '/problems' routes
@@ -33,7 +35,7 @@ var submissionUpload = submission.fields([
 problems.get('/:id', auth.isAuth, problemsCtrl.get )
 problems.get('/:id/validateCategory', auth.isAuth, problemsCtrl.validateCategory )
 problems.get('/', auth.isAuth, problemsCtrl.list )
-problems.post('/:id/submit', auth.isAuth, submissionUpload, problemsCtrl.submit )
+problems.post('/:id/submit', auth.isAuth, submissionUploadCode, problemsCtrl.submit )
 problems.post('/', auth.isAuth, problemUpload, problemsCtrl.create )
 problems.put('/:id', auth.isAuth, problemUpload, problemsCtrl.update)
 problems.delete('/:id', auth.isAuth, problemsCtrl.remove )
