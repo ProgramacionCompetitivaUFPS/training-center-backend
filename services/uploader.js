@@ -26,7 +26,7 @@ var multer_storage = multer.diskStorage({
             if (file.fieldname == 'output') ext = '.out'
             if( file.fieldname == 'input' || file.fieldname == 'output' ) 
                 fieldname = raw.toString('hex') + moment() + ext
-            if( file.fieldname == 'code' )
+            if( file.fieldname == 'code' || file.fieldname == 'XMLCode')
                 fieldname = raw.toString('hex') + moment() + path.extname(file.originalname)
             if( file.fieldname == 'pdf')
                 fieldname = raw.toString('hex') + moment() + '.pdf'
@@ -54,14 +54,16 @@ var materialsDataFilter = function (req, file, cb) {
 }
 
 var submissionsDataFilter = function (req, file, cb) {
-    let ext = path.extname( file.originalname );
-    
+    let ext = path.extname( file.originalname )
+    const blocklysubmission = req.headers.blocklysubmission
+
     if(file.fieldname == 'XMLCode'){
-        if(ext !== '.xml'){
+        if(blocklysubmission == '0' || ext !== '.xml'){
             return cb( new Error('Solo se permite la carga de archivos .xml para soluciones en Blockly') )
         }
     }else if(file.fieldname == 'code'){
-        if( ext !== '.cpp' && ext !== '.cc' && ext !== '.cxx' && ext !== '.c' && ext !== '.cp' && ext !== '.java' && ext !== '.py') {
+        console.log('entro aki', ext)
+        if(ext !== '.cpp' && ext !== '.cc' && ext !== '.cxx' && ext !== '.c' && ext !== '.cp' && ext !== '.java' && ext !== '.py') {
 
             return cb( new Error('Sólo estan permitidos archivos .cpp, .java y .py') )
         }

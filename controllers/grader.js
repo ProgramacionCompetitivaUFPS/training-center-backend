@@ -12,7 +12,7 @@ const socket = require('../services/socketsApi')
  * Grader controller 
  */
 
-function judge( submission_id, contest ) {
+function judge( submission_id, contest, fileNameExecution, filePathExecution) {
     getSubmissionData( submission_id, (res) =>{
         let data = res
 
@@ -20,34 +20,39 @@ function judge( submission_id, contest ) {
         
         getProblemData( data, () => {
             //url de la ruta donde se almaceno el archivo desde /files
-            var n = data.file_path.indexOf('/files')
-
-            console.log("n para file path ", n, data.file_path)
-            let file_path = data.file_path.substring(n, data.file_path.length )
-
+            var n = filePathExecution.indexOf('/files')
+            let file_path = filePathExecution.substring(n, filePathExecution.length )
             //url de la ruta donde esta el input desde /files
             n = data.input.indexOf('/files')
             let input_path = data.input.substring(n, data.input.length )
-
             //url de la ruta donde esta el output desde /files
             n = data.output.indexOf('/files')
             let output_path = data.output.substring(n, data.output.length )
-
+            
             //Directorio temporal de la ejecución
             let folder = crypto.randomBytes(24).toString('hex')
             let input_filename = path.basename( data.input )
             let output_filename = path.basename( data.output )
 
+            let file_xml_name='', file_xml_path=''; //xml como formato para mostrar en blockly
+            if(res.file_name.endsWith('xml')){
+                file_xml_name = res.file_name
+                n = res.file_path.indexOf('/files')
+                file_xml_path = res.file_path.substring(n, res.file_path.length )
+            }
+
             let execution = new Sandbox(
                 file_path,
-                data.file_name,
+                fileNameExecution,
                 folder,
                 data.time_limit,
                 input_path,
                 output_path,
                 data.language,
                 input_filename,
-                output_filename
+                output_filename,
+                file_xml_name,
+                file_xml_path
             )
 
             execution.checkStatus( ( status ) => {
@@ -93,6 +98,7 @@ function getSubmissionData( submission_id, cb ){
         cb( data )
     }).catch( (err) => {
         console.log( "Error trayendo el envio")
+        console.log(err)
     } )
 }
 
@@ -109,6 +115,7 @@ function getProblemData( data, cb ){
         cb()
     }).catch( (err) => {
         console.log( "Error trayendo el problema")
+        console.log(err)
     } )
 }
 

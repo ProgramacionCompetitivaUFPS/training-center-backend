@@ -330,16 +330,27 @@ function submit(req, res) {
 
     req.body.user_id = req.user.sub
     req.body.problem_id = req.params.id
-    req.body.file_name = req.files['code'][0].filename
-    req.body.file_path = req.files['code'][0].path
     req.body.status = 'in queue'
 
+    //archivo que se evalua
+    const fileNameExecution =  req.files['code'][0].filename
+    const filePathExecution = req.files['code'][0].path
+
+    if(req.files['XMLCode']){
+        console.log('XML COOOooooooooooooooooooooooooooooooooooooODE', req.files['XMLCode'])
+        req.body.file_name = req.files['XMLCode'][0].filename
+        req.body.file_path = req.files['XMLCode'][0].path
+    }else{
+        req.body.file_name = fileNameExecution
+        req.body.file_path = filePathExecution
+    }
+    
     let isContest = false
     if (req.body.contest_problem_id) isContest = true
 
     Submission.create(req.body)
         .then(submission => {
-            Grader.judge(submission.id, isContest)
+            Grader.judge(submission.id, isContest, fileNameExecution, filePathExecution)
             return res.status(200).send(submission)
         })
         .catch(error => {

@@ -6,7 +6,7 @@ const path = require('path')
 const fs = require('fs')
 
 class Sandbox {
-  constructor (file_path, file_name, folder, time_limit, input, output, language, input_filename, output_filename) {
+  constructor (file_path, file_name, folder, time_limit, input, output, language, input_filename, output_filename, file_xml_name, file_xml_path) {
     this.file_path = file_path /* ruta del codigo a ejecutar */
     this.file_name = file_name /* nombre del archivo de codigo a ejecutar */
     this.folder = folder /* nombre de la carpeta temporal de la ejecucion */
@@ -16,6 +16,8 @@ class Sandbox {
     this.language = language
     this.input_filename = input_filename /* nombre del archivo input */
     this.output_filename = output_filename /* nombre del archivo output */
+    this.file_xml_name = file_xml_name /* nombre del codigo a mostrar para blockly */
+    this.file_xml_path = file_xml_path /* ruta del codigo a mostrar para blockly */
     this.path = path.dirname(__dirname)
     this.execution_directory = path.join( this.path, 'files', folder )
     this.config = new Config()
@@ -64,6 +66,13 @@ class Sandbox {
     " && sed -i 's/{input}/\\/files\\/" + this.folder + '\\/' + this.input_filename + "/g' " + this.execution_directory + '/' + this.runner + /* Reemplazo del archivo de entradas en el script de shell  */
     " && sed -i 's/{folder}/" + this.folder + "/g' " + this.execution_directory + '/' + this.runner /* Reemplazo de la carpeta en el script de shell  */
 
+    //agregando unos comandos adicionales
+    if(this.file_xml_name !== '' && this.file_xml_path !== ''){
+      console.log('ENTRO ACAAAAAAAA')
+      script += ' && cp ' + path.join(this.path, this.file_xml_path) + ' ' + this.execution_directory + /* Copia el source de la submission en bloques */
+      ' && rm -rf ' + path.join(this.path, this.file_path)// eliminar el source en codigo fuente 
+    }
+
     console.log("*********PREPARAR ARCHIVOS: ************")
     console.log(script)
 
@@ -71,7 +80,7 @@ class Sandbox {
             if (error) {
                 console.log("*************    HAN OCURRIDO ERRORES  *************")
                 console.log( stderr )
-                //this.removeExecutionFolder()
+                this.removeExecutionFolder()
             } else success()
         }
     )
@@ -119,10 +128,10 @@ class Sandbox {
 
         if (ans === 'Timelimit') {
           success('Time Limit Exceeded', this.timeLimit)
-          //this.removeExecutionFolder()
+          this.removeExecutionFolder()
         } else if (ans === 'Runtime') {
           success('Runtime Error', execTime)
-          //this.removeExecutionFolder()
+          this.removeExecutionFolder()
         } else this.validateOutput(execTime, success)
       })
     })
@@ -132,12 +141,14 @@ class Sandbox {
     exec('diff ' + path.join(this.execution_directory, 'output.out') + ' ' + path.join(this.execution_directory, this.output_filename), (error, stdout, stderr) => {
       if (error) success('Wrong Answer', execTime)
       else success('Accepted', execTime)
-      //this.removeExecutionFolder()
+      this.removeExecutionFolder()
     })
   }
 
   
-
+  /**
+   * Elimina la carpeta temporal donde se evalua la submission
+   */
   removeExecutionFolder () {
     exec(
       'rm -rf ' + this.execution_directory 
