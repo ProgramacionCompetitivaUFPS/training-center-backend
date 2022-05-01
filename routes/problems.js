@@ -24,7 +24,7 @@ var submissionCode = multer({
 
 var submissionUploadCode = submissionCode.fields([
     { name: 'code', maxCount: 1 },
-    { name: 'XMLCode', maxCount: 1 } //para las soluciones en bloques
+    { name: 'svgBlocklyCode', maxCount: 1 }
 ])
 
 

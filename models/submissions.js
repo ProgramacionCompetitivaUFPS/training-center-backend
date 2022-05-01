@@ -67,6 +67,10 @@ module.exports = (sequelize, DataTypes) => {
                 key: 'id'
             },
             allowNull: true
+        },
+        blockly_file_name: {
+            allowNull: true,
+            type: DataTypes.STRING
         }
     }, {
         underscored: true,

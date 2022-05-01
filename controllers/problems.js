@@ -335,14 +335,12 @@ function submit(req, res) {
     //archivo que se evalua
     const fileNameExecution =  req.files['code'][0].filename
     const filePathExecution = req.files['code'][0].path
+    req.body.file_name = fileNameExecution
+    req.body.file_path = filePathExecution
 
-    if(req.files['XMLCode']){
-        console.log('XML COOOooooooooooooooooooooooooooooooooooooODE', req.files['XMLCode'])
-        req.body.file_name = req.files['XMLCode'][0].filename
-        req.body.file_path = req.files['XMLCode'][0].path
-    }else{
-        req.body.file_name = fileNameExecution
-        req.body.file_path = filePathExecution
+    if(req.files['svgBlocklyCode']){
+        console.log('svg COOOooooooooooooooooooooooooooooooooooooODE', req.files['svgBlocklyCode'])
+        req.body.blockly_file_name = req.files['svgBlocklyCode'][0].filename
     }
     
     let isContest = false
