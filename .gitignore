@@ -1,4 +1,4 @@
-
+/files
 npm-debug.log
 node_modules
 .DS_Store
@@ -7,3 +7,4 @@ package-lock.json
 files
 sonar-project.properties
 .scannerwork
+.idea

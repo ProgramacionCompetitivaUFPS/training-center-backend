@@ -15,6 +15,8 @@ var multer_storage = multer.diskStorage({
 
         if (file.fieldname == 'code') d = 'codes'
 
+        if(file.fieldname == 'svgBlocklyCode') d = 'codes/blockly_svg_sources'
+
         cb(null, path.join(__dirname, `../files/${d}`) )
     },
     filename: function (req, file, cb) {
@@ -26,7 +28,7 @@ var multer_storage = multer.diskStorage({
             if (file.fieldname == 'output') ext = '.out'
             if( file.fieldname == 'input' || file.fieldname == 'output' ) 
                 fieldname = raw.toString('hex') + moment() + ext
-            if( file.fieldname == 'code' )
+            if( file.fieldname == 'code' || file.fieldname == 'svgBlocklyCode')
                 fieldname = raw.toString('hex') + moment() + path.extname(file.originalname)
             if( file.fieldname == 'pdf')
                 fieldname = raw.toString('hex') + moment() + '.pdf'
@@ -54,11 +56,21 @@ var materialsDataFilter = function (req, file, cb) {
 }
 
 var submissionsDataFilter = function (req, file, cb) {
-    let ext = path.extname( file.originalname );
-    
-    if ( ext !== '.cpp' && ext !== '.cc' && ext !== '.cxx' && ext !== '.c' && ext !== '.cp' && ext !== '.java' && ext !== '.py'  ) {
-        return cb( new Error('Sólo estan permitidos archivos .cpp, .java y .py') )
+    let ext = path.extname( file.originalname )
+    const blocklysubmission = req.headers.blocklysubmission
+
+    if(file.fieldname == 'svgBlocklyCode'){
+        if(blocklysubmission == '0' || ext !== '.svg'){
+            return cb( new Error('El formato para la subida de soluciones en blockly es incorrecto') )
+        }
+    }else if(file.fieldname == 'code'){
+        console.log('entro aki', ext)
+        if(ext !== '.cpp' && ext !== '.cc' && ext !== '.cxx' && ext !== '.c' && ext !== '.cp' && ext !== '.java' && ext !== '.py') {
+
+            return cb( new Error('Sólo estan permitidos archivos .cpp, .java y .py') ) 
+        }
     }
+
     cb(null, true)
 }
 

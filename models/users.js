@@ -12,131 +12,157 @@ const bcrypt = require("bcrypt-nodejs");
  * @param {any} DataTypes
  * @returns
  */
-module.exports = function (sequelize, DataTypes) {
+module.exports = function(sequelize, DataTypes) {
 
-  var Users = sequelize.define('users', {
-    id: {
-      allowNull: false,
-      autoIncrement: true,
-      primaryKey: true,
-      type: DataTypes.INTEGER
-    },
-    name: {
-      allowNull: false,
-      type: DataTypes.STRING,
-      validate: {
-        len: {
-          args: 3,
-          msg: "El campo nombre no puede ser vacio."
-        }
-      }
-    },
-    email: {
-      allowNull: false,
-      type: DataTypes.STRING,
-      unique: true,
-      validate: {
-        len: {
-          args: [6, 128],
-          msg: "El email debe tener entre 6 y 128 caracteres."
+    var Users = sequelize.define('users', {
+        id: {
+            allowNull: false,
+            autoIncrement: true,
+            primaryKey: true,
+            type: DataTypes.INTEGER
         },
-        isEmail: {
-          msg: "Debe proporcionar un email válido."
+        name: {
+            allowNull: false,
+            type: DataTypes.STRING,
+            validate: {
+                len: {
+                    args: 3,
+                    msg: "El campo nombre no puede ser vacio."
+                }
+            }
+        },
+        email: {
+            allowNull: false,
+            type: DataTypes.STRING,
+            unique: true,
+            validate: {
+                len: {
+                    args: [6, 128],
+                    msg: "El email debe tener entre 6 y 128 caracteres."
+                },
+                isEmail: {
+                    msg: "Debe proporcionar un email válido."
+                }
+            }
+        },
+        password: {
+            allowNull: false,
+            type: DataTypes.STRING,
+            validate: {
+                len: {
+                    args: 3,
+                    msg: "Debe proporcionar una contraseña válida."
+                }
+            }
+        },
+        confirm_password: {
+            type: DataTypes.VIRTUAL
+        },
+        code: {
+            type: DataTypes.STRING
+        },
+        type: {
+            allowNull: false,
+            type: DataTypes.INTEGER
+        },
+        username: {
+            allowNull: false,
+            type: DataTypes.STRING,
+            unique: true,
+            validate: {
+                len: {
+                    args: [6, 30],
+                    msg: "El nombre de usuario debe tener entre 6 y 30 caracteres."
+                }
+            }
+        },
+        socket_id: {
+            type: DataTypes.STRING,
+            allowNull: true
+        },
+        education_level: {
+            type: DataTypes.INTEGER,
+            allowNull: true
+        },
+        institution: {
+            type: DataTypes.STRING,
+            allowNull: true
+        },
+        profile_image_url: {
+            type: DataTypes.STRING,
+            allowNull: true
+        },
+        status_learning: {
+            type: DataTypes.INTEGER,
+            allowNull: true
         }
-      }
-    },
-    password: {
-      allowNull: false,
-      type: DataTypes.STRING,
-      validate: {
-        len: {
-          args: 3,
-          msg: "Debe proporcionar una contraseña válida."
-        }
-      }
-    },
-    confirm_password: {
-      type: DataTypes.VIRTUAL
-    },
-    code: {
-      type: DataTypes.STRING
-    },
-    type: {
-      allowNull: false,
-      type: DataTypes.INTEGER
-    },
-    username: {
-      allowNull: false,
-      type: DataTypes.STRING,
-      unique: true,
-      validate: {
-        len: {
-          args: [6, 30],
-          msg: "El nombre de usuario debe tener entre 6 y 30 caracteres."
-        }
-      }
-    },
-    socket_id: {
-      type: DataTypes.STRING,
-      allowNull: true
-    }
-  }, {
-      classMethods: {
-        /**
-         * 
-         * @param {any} models
-         */
-        associate: function (models) {
-          Users.hasMany( models.problems, {as: 'problems'})
-        
-          Users.hasMany( models.materials, {as: 'materials'})
+    }, {
+        hooks: {
+            beforeCreate: hashPassword,
+            beforeUpdate: hashPassword
+        },
+        underscored: true,
+        underscoredAll: true,
+    });
 
-          Users.hasMany( models.submissions, {as: 'submissions'})
-          
-          Users.belongsToMany(models.syllabuses, {
+    //Class methods
+
+    Users.associate = (models) => {
+        Users.hasMany(models.problems, { as: 'problems' })
+
+        Users.hasMany(models.materials, { as: 'materials' })
+
+        Users.hasMany(models.posts, { as: 'posts' })
+
+        Users.hasMany(models.reports_forums, { as: 'reports_forums' })
+
+        Users.hasMany(models.forums, { as: 'forums' })
+
+        Users.hasMany(models.submissions, { as: 'submissions' })
+
+        Users.belongsToMany(models.syllabuses, {
             through: 'syllabus_students',
             as: 'syllabuses'
-          })
+        })
 
-          Users.belongsToMany(models.contests, {
+        Users.belongsToMany(models.contests, {
             through: 'contests_students',
             as: 'contests',
             onDelete: 'CASCADE'
-          })
-        }
-      },
-      instanceMethods: {
-        /**
-         * Hide passwords from queries
-         * @returns
-         */
-        toJSON: function () {
-          var values = Object.assign({}, this.get());
-          delete values.password;
-          return values;
-        },
+        })
 
-        /**
-         * Verify the password on login
-         * @param {any} value
-         * @returns
-         */
-        authenticate: function (value) {
-          if (bcrypt.compareSync(value, this.password))
+        Users.belongsToMany(models.teams, {
+            through: 'users_teams',
+            as: 'teams',
+            onDelete: 'CASCADE'
+        })
+    }
+
+    // Instance methods
+
+    /**
+     * Hide passwords from queries
+     * @returns
+     */
+    Users.prototype.toJSON = function() {
+        var values = Object.assign({}, this.get());
+        delete values.password;
+        return values;
+    };
+
+    /**
+     * Verify the password on login
+     * @param {any} value
+     * @returns
+     */
+    Users.prototype.authenticate = function(value) {
+        if (bcrypt.compareSync(value, this.password))
             return this;
-          else
+        else
             return false;
-        }
-      },
-      hooks: {
-        beforeCreate: hashPassword,
-        beforeUpdate: hashPassword
-      },
-      underscored: true,
-      underscoredAll: true,
-    });
+    };
 
-  return Users;
+    return Users;
 };
 
 
@@ -147,18 +173,18 @@ module.exports = function (sequelize, DataTypes) {
  * @param {any} callback
  * @returns
  */
-var hashPassword = function (user, options, callback) {
-  user.email = user.email.toLowerCase()
+var hashPassword = function(user, options, callback) {
+    user.email = user.email.toLowerCase()
 
-  if (!user.changed('password')) return callback()
+    if (!user.changed('password')) return callback()
 
-  if (user.password != user.confirm_password) {
-    throw new Error("Las contraseñas no coinciden");
-  }
+    if (user.password != user.confirm_password) {
+        throw new Error("Las contraseñas no coinciden");
+    }
 
-  bcrypt.hash(user.get('password'), bcrypt.genSaltSync(10), null, (err, hash) => {
-    if (err) return callback(err);
-    user.set('password', hash);
-    return callback(null, options);
-  })
+    bcrypt.hash(user.get('password'), bcrypt.genSaltSync(10), null, (err, hash) => {
+        if (err) return callback(err);
+        user.set('password', hash);
+        return callback(null, options);
+    })
 }

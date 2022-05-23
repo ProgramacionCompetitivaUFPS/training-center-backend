@@ -3,6 +3,9 @@
 const Category = require('../models').categories
 const _ = require('lodash');
 
+const Sequelize = require('sequelize')
+const Op = Sequelize.Op
+
 /**
  * Categories controller 
  */
@@ -13,7 +16,18 @@ const _ = require('lodash');
  * @param {any} res
  */
 function index(req, res) {
-    Category.findAll()
+
+    let condition = {}
+
+    if (req.query.type) {
+        condition.type = {
+            [Op.or]: [req.query.type, 3]
+        }
+    }
+
+    Category.findAll({
+            where: condition
+        })
         .then((categories) => {
             return res.status(200).send({ categories })
         })
@@ -26,8 +40,8 @@ function create(req, res) {
     if (req.user.usertype != 2) {
         return res.status(401).send({ error: 'No se encuentra autorizado' })
     }
-    
-    if( !req.body.name ){
+
+    if (!req.body.name) {
         return res.status(400).send({ error: 'Datos incompletos' })
     }
 
@@ -47,14 +61,14 @@ function remove(req, res) {
     }
 
     Category.destroy({
-        where: {
-            id: req.params.id
-        }
-    })
-        .then(function (deletedRecords) {
-            res.status(200).json( deletedRecords );
+            where: {
+                id: req.params.id
+            }
         })
-        .catch(function (error) {
+        .then(function(deletedRecords) {
+            res.status(200).json(deletedRecords);
+        })
+        .catch(function(error) {
             res.status(500).json(error);
         });
 }
@@ -64,18 +78,15 @@ function update(req, res) {
         return res.status(401).send({ error: 'No se encuentra autorizado' })
     }
 
-    Category.update(
-        {
-            name: req.body.name,
+    Category.update({
+        name: req.body.name,
+    }, {
+        where: {
+            id: req.params.id
         },
-        {
-            where: {
-                id: req.params.id
-            },
-            fields: ['name']
-        }
-    ).then(( affectedRows ) => {
-        if ( affectedRows ) return res.status(200).send( {id: req.params.id, name: req.body.name })
+        fields: ['name']
+    }).then((affectedRows) => {
+        if (affectedRows) return res.status(200).send({ id: req.params.id, name: req.body.name })
 
     }).catch((err) => {
         return res.sendStatus(500)

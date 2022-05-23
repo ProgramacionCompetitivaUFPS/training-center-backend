@@ -6,7 +6,7 @@ const path = require('path')
 const fs = require('fs')
 
 class Sandbox {
-  constructor (file_path, file_name, folder, time_limit, input, output, language, input_filename, output_filename) {
+  constructor (file_path, file_name, folder, time_limit, input, output, language, input_filename, output_filename, file_xml_name, file_xml_path) {
     this.file_path = file_path /* ruta del codigo a ejecutar */
     this.file_name = file_name /* nombre del archivo de codigo a ejecutar */
     this.folder = folder /* nombre de la carpeta temporal de la ejecucion */
@@ -16,9 +16,14 @@ class Sandbox {
     this.language = language
     this.input_filename = input_filename /* nombre del archivo input */
     this.output_filename = output_filename /* nombre del archivo output */
+    this.file_xml_name = file_xml_name /* nombre del codigo a mostrar para blockly */
+    this.file_xml_path = file_xml_path /* ruta del codigo a mostrar para blockly */
     this.path = path.dirname(__dirname)
     this.execution_directory = path.join( this.path, 'files', folder )
     this.config = new Config()
+
+    console.log("***************NEW SANDBOX ****************")
+    console.log(this)
 
     this.configureLanguage()
   }
@@ -37,27 +42,43 @@ class Sandbox {
   }
   
   run (success) {
+
     this.setUpEnvironment(() => {
       this.execute(success)
     })
   }
 
   setUpEnvironment (success) {
-    exec(
-      'mkdir ' + this.execution_directory + /* Crea la carpeta temporal */
-      ' && cp ' + path.join(__dirname, 'util', this.runner) + ' ' + this.execution_directory + /* Copia los scripts al directorio */
-      ' && chmod 777 ' + this.execution_directory + /* Asigna permisos a los scripts */
-      ' && cp ' + path.join(this.path, this.input) + ' ' + this.execution_directory + /* Copia el input del problema */
-      ' && cp ' + path.join(this.path, this.output) + ' ' + this.execution_directory + /* Copia el output del problema */
-      ' && cp ' + path.join(this.path, this.file_path) + ' ' + this.execution_directory + /* Copia el source del usuario */
-      ' && mv ' + this.execution_directory + '/' + this.file_name + ' ' + this.execution_directory + '/' + this.fileName + /* Renombrar el fuente para poderlo ejecutar */
-      " && sed -i 's/{TL}/" + this.timeLimit + "/g' " + this.execution_directory + '/' + this.runner + /* Reemplazo del TL en el script de shell  */
-      " && sed -i 's/{path}/\\/files\\/" + this.folder + '\\/' + "/g' " + this.execution_directory + '/' + this.runner + /* Reemplazo del path del archivo a ejecutar en el script de shell  */
-      " && sed -i 's/{code}/" + this.executionFile + "/g' " + this.execution_directory + '/' + this.runner + /* Reemplazo del archivo a ejecutar en el script de shell  */
-      " && sed -i 's/{input}/\\/files\\/" + this.folder + '\\/' + this.input_filename + "/g' " + this.execution_directory + '/' + this.runner + /* Reemplazo del archivo de entradas en el script de shell  */
-      " && sed -i 's/{folder}/" + this.folder + "/g' " + this.execution_directory + '/' + this.runner /* Reemplazo de la carpeta en el script de shell  */
-      , (error, stdout, stderr) => {
+
+    let script = 'mkdir ' + this.execution_directory + /* Crea la carpeta temporal */
+
+    ' && cp ' + path.join(__dirname, 'util', this.runner) + ' ' + this.execution_directory + /* Copia los scripts al directorio */
+
+    ' && chmod 777 ' + this.execution_directory + /* Asigna permisos a los scripts */
+
+    ' && cp ' + path.join(this.path, this.input) + ' ' + this.execution_directory + /* Copia el input del problema */
+    ' && cp ' + path.join(this.path, this.output) + ' ' + this.execution_directory + /* Copia el output del problema */
+    ' && cp ' + path.join(this.path, this.file_path) + ' ' + this.execution_directory + /* Copia el source del usuario */
+    ' && mv ' + this.execution_directory + '/' + this.file_name + ' ' + this.execution_directory + '/' + this.fileName + /* Renombrar el fuente para poderlo ejecutar */
+    " && sed -i 's/{TL}/" + this.timeLimit + "/g' " + this.execution_directory + '/' + this.runner + /* Reemplazo del TL en el script de shell  */
+    " && sed -i 's/{path}/\\/files\\/" + this.folder + '\\/' + "/g' " + this.execution_directory + '/' + this.runner + /* Reemplazo del path del archivo a ejecutar en el script de shell  */
+    " && sed -i 's/{code}/" + this.executionFile + "/g' " + this.execution_directory + '/' + this.runner + /* Reemplazo del archivo a ejecutar en el script de shell  */
+    " && sed -i 's/{input}/\\/files\\/" + this.folder + '\\/' + this.input_filename + "/g' " + this.execution_directory + '/' + this.runner + /* Reemplazo del archivo de entradas en el script de shell  */
+    " && sed -i 's/{folder}/" + this.folder + "/g' " + this.execution_directory + '/' + this.runner /* Reemplazo de la carpeta en el script de shell  */
+
+    //agregando unos comandos adicionales
+    if(this.file_xml_name !== '' && this.file_xml_path !== ''){
+      console.log('ENTRO ACAAAAAAAA')
+      script += ' && cp ' + path.join(this.path, this.file_xml_path) + ' ' + this.execution_directory + /* Copia el source de la submission en bloques */
+      ' && rm -rf ' + path.join(this.path, this.file_path)// eliminar el source en codigo fuente 
+    }
+
+    console.log("*********PREPARAR ARCHIVOS: ************")
+    console.log(script)
+
+    exec(script, (error, stdout, stderr) => {
             if (error) {
+                console.log("*************    HAN OCURRIDO ERRORES  *************")
                 console.log( stderr )
                 this.removeExecutionFolder()
             } else success()
@@ -81,7 +102,9 @@ class Sandbox {
     let container = this.config.containers[this.languageId]
     let ins = 'docker exec ' + container + ' ' + compiler
 
-    //console.log( ins )
+    console.log("**************** INSTRUCCION ****************")
+    console.log(ins)
+
     exec(ins, (error, stdout, stderr) => {
       if (error) {
         console.log(error)
@@ -123,7 +146,9 @@ class Sandbox {
   }
 
   
-
+  /**
+   * Elimina la carpeta temporal donde se evalua la submission
+   */
   removeExecutionFolder () {
     exec(
       'rm -rf ' + this.execution_directory 
