@@ -82,8 +82,6 @@ module.exports = (sequelize, DataTypes) => {
             }
         })
 
-        Materials.hasMany(models.tags, { as: 'tags' })
-
         Materials.belongsTo(sequelize.models.categories, {
             onDelete: "NULL",
             foreignKey: {

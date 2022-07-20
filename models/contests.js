@@ -74,12 +74,6 @@ module.exports = (sequelize, DataTypes) => {
             as: 'users',
             onDelete: 'CASCADE'
         })
-
-        Contests.belongsToMany(models.teams, {
-            through: 'contests_teams',
-            as: 'teams',
-            onDelete: 'CASCADE'
-        })
     }
 
     return Contests;

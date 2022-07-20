@@ -112,12 +112,6 @@ module.exports = function(sequelize, DataTypes) {
 
         Users.hasMany(models.materials, { as: 'materials' })
 
-        Users.hasMany(models.posts, { as: 'posts' })
-
-        Users.hasMany(models.reports_forums, { as: 'reports_forums' })
-
-        Users.hasMany(models.forums, { as: 'forums' })
-
         Users.hasMany(models.submissions, { as: 'submissions' })
 
         Users.belongsToMany(models.syllabuses, {
@@ -128,12 +122,6 @@ module.exports = function(sequelize, DataTypes) {
         Users.belongsToMany(models.contests, {
             through: 'contests_students',
             as: 'contests',
-            onDelete: 'CASCADE'
-        })
-
-        Users.belongsToMany(models.teams, {
-            through: 'users_teams',
-            as: 'teams',
             onDelete: 'CASCADE'
         })
     }
