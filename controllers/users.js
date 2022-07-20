@@ -274,7 +274,7 @@ function getSubmissions(req, res) {
             include: [
                 { model: Problems, attributes: ['title_en', 'id', 'title_es', 'level'] }
             ],
-            attributes: ['id', 'language', 'file_name', 'execution_time', 'verdict', 'status', 'created_at'],
+            attributes: ['id', 'language', 'file_name', 'execution_time', 'verdict', 'status', 'created_at', 'blockly_file_name'],
             limit: limit,
             order: order,
             offset: offset,
@@ -296,6 +296,10 @@ function getSubmission(req, res) {
     return res.sendFile(path.join(path.dirname(__dirname), 'files', 'codes', req.params.submission))
 }
 
+function getSvgSubmission(req, res) {
+    return res.sendFile(path.join(path.dirname(__dirname), 'files', 'codes','blockly_svg_sources', req.params.submission))
+}
+
 
 module.exports = {
     index,
@@ -308,5 +312,6 @@ module.exports = {
     removeAccounts,
     getSubmissions,
     getSubmission,
-    getUser
+    getUser,
+    getSvgSubmission
 }

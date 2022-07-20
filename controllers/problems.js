@@ -30,16 +30,13 @@ function create(req, res) {
     req.body.category_id = req.body.category
     req.body.input = req.files['input'][0].path
     req.body.output = req.files['output'][0].path
-
-    //req.body.userId = req.user.sub
     req.body.user_id = req.user.sub
-    console.log(req.body)
+
     Problem.create(req.body)
         .then(problem => {
             return res.sendStatus(201)
         })
         .catch(error => {
-            console.log(error)
             error = _.omit(error, ['parent', 'original', 'sql'])
             return res.status(400).send(error)
         })
@@ -325,6 +322,9 @@ function submit(req, res) {
 
     req.body = req.body.data
 
+    console.log("************** INFORMACION DE LOS ARCHIVOS *****************");
+    console.log(req.files)
+
     if (!req.files['code'] || !req.body.language)
         return res.status(400).send({ error: 'Datos incompletos' })
 
@@ -339,7 +339,7 @@ function submit(req, res) {
     req.body.file_path = filePathExecution
 
     if(req.files['svgBlocklyCode']){
-        console.log('It\'s a svg Blockly code', req.files['svgBlocklyCode'])
+        console.log('svg COOOooooooooooooooooooooooooooooooooooooODE', req.files['svgBlocklyCode'])
         req.body.blockly_file_name = req.files['svgBlocklyCode'][0].filename
     }
     
