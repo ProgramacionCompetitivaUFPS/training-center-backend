@@ -257,7 +257,7 @@ function list(req, res) {
             Problem.findAndCountAll({
                 where: condition,
                 distinct: 'id',
-                attributes: ['id', 'title_es', 'title_en', 'level', 'user_id'],
+                attributes: ['id', 'title_es', 'title_en', 'level'],
                 include: [{
                     model: Submission,
                     as: 'submissions',
@@ -288,7 +288,7 @@ function list(req, res) {
         Problem.findAndCountAll({
             where: condition,
             distinct: 'id',
-            attributes: ['id', 'title_es', 'title_en', 'level', 'user_id'],
+            attributes: ['id', 'title_es', 'title_en', 'level'],
             limit: limit,
             include: [{
                 model: Submission,

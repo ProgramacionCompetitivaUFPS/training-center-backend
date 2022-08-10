@@ -49,12 +49,12 @@ module.exports = (sequelize, DataTypes) => {
                     msg: "Debe proporcionar una contraseña válida."
                 }
             }
-        },
+        }/*,
         type: {
             allowNull: false,
             type: DataTypes.INTEGER,
             defaultValue: 0
-        }
+        }*/
     }, {
         underscored: true,
         underscoredAll: true

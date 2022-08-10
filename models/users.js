@@ -84,10 +84,10 @@ module.exports = function(sequelize, DataTypes) {
             type: DataTypes.INTEGER,
             allowNull: true
         },
-        institution: {
-            type: DataTypes.STRING,
-            allowNull: true
-        },
+        // institution: {
+        //     type: DataTypes.STRING,
+        //     allowNull: true
+        // },
         profile_image_url: {
             type: DataTypes.STRING,
             allowNull: true
@@ -95,6 +95,14 @@ module.exports = function(sequelize, DataTypes) {
         status_learning: {
             type: DataTypes.INTEGER,
             allowNull: true
+        },
+        institution_id: {
+            type: DataTypes.INTEGER,
+            allowNull: true,
+            references: {
+                model: 'institutions',
+                key: 'id'
+            }
         }
     }, {
         hooks: {
@@ -104,15 +112,19 @@ module.exports = function(sequelize, DataTypes) {
         underscored: true,
         underscoredAll: true,
     });
-
     //Class methods
-
     Users.associate = (models) => {
         Users.hasMany(models.problems, { as: 'problems' })
 
         Users.hasMany(models.materials, { as: 'materials' })
 
         Users.hasMany(models.submissions, { as: 'submissions' })
+
+        Users.belongsTo(models.institutions, {
+            foreignKey: {
+                allowNull: true,
+            }
+        })
 
         Users.belongsToMany(models.syllabuses, {
             through: 'syllabus_students',

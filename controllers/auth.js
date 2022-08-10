@@ -26,12 +26,19 @@ function signIn(req, res) {
             email: req.body.email
         }
     }).then(function(user) {
-        if (user.authenticate(req.body.password))
-            res.status(200).send({ token: authService.createToken(user) })
-        else
+        if (user.authenticate(req.body.password)){
+            if(user.institution_id === null){
+                res.status(200).send({ token: authService.createToken(user),
+                    actualizado: -1});
+            } else { 
+                res.status(200).send({ token: authService.createToken(user),
+                    actualizado: user.institution_id});
+            }
+        } else
             res.status(401).send({ error: 'Contraseña incorrecta' })
 
     }).catch(function(err) {
+        console.log(err)
         res.status(401).send({ error: 'Email incorrecto' })
     })
 }

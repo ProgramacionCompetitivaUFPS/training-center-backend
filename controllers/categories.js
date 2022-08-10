@@ -36,6 +36,19 @@ function index(req, res) {
         })
 }
 
+function index2(req, res) {
+
+    Category.findAll({
+
+        })
+        .then((categories) => {
+            return res.status(200).send({ categories })
+        })
+        .catch((err) => {
+            return res.status(500).send({ error: `${err}` })
+        })
+}
+
 function create(req, res) {
     if (req.user.usertype != 2) {
         return res.status(401).send({ error: 'No se encuentra autorizado' })
@@ -95,6 +108,7 @@ function update(req, res) {
 
 module.exports = {
     index,
+    index2,
     create,
     remove,
     update

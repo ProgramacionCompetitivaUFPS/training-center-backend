@@ -5,11 +5,18 @@ const ContestProblems = require('../models').contests_problems
 const Submissions = require('../models').submissions
 const Problem = require('../models').problems
 const User = require('../models').users
+const Institution = require('../models').institutions
 const ContestStudent = require('../models').contests_students
 const _ = require('lodash')
 const moment = require('moment')
 
+const env = process.env.NODE_ENV || "development"
+const config = require('../config/config.js')[env]
+
 const Sequelize = require('sequelize')
+const sequelize = new Sequelize(config.url, config)
+
+const {categories: Category} = require("../models");
 const Op = Sequelize.Op
 
 /**
@@ -51,11 +58,9 @@ function index(req, res) {
             where: {
                 id: req.params.id
             },
-            include: [{
-                model: User,
-                attributes: ['name', 'id', 'username', 'email']
-            }],
-            attributes: ['id', 'title', 'description', 'init_date', 'end_date', 'rules', 'public', 'key']
+            include: [
+                { model: User, attributes: ['name', 'id', 'username','email'] },
+            ]
         })
         .then((contest) => {
             return res.status(200).send({ contest })
@@ -287,10 +292,26 @@ function removeStudent(req, res) {
 }
 
 function list(req, res) {
-    console.log(req.query)
     let limit = (req.query.limit) ? parseInt(req.query.limit) : 10
     let offset = (req.query.page) ? limit * (parseInt(req.query.page) - 1) : 0
+    let by = (req.query.by) ? req.query.by : 'DESC'
+    let orderQuery = (req.query.order)
+    let orderF = null;
+    if(orderQuery){
+        switch (orderQuery){
+            case "Id": orderF="id"
+                break;
+            case "Nombre": orderF="title"
+                break;
 
+        }
+    }else{
+        orderF="id"
+    }
+
+    let order = [];
+
+    order[0] = [orderF, by]
     let condition = {}
     let meta = {}
 
@@ -300,7 +321,6 @@ function list(req, res) {
         condition.id = {
             [Op.ne]: null
         }
-
     if (req.query.filter) {
         if (req.query.filter == 'private') condition.public = false
         else condition.public = true
@@ -327,16 +347,14 @@ function list(req, res) {
 
     Contest.findAndCountAll({
         where: condition,
-        include: [{
-            model: User,
-            attributes: ['name', 'id', 'username', 'email']
-        }],
+        include:
+            [
+                { model: User, attributes: ['name', 'id', 'username','email'] },
+            ],
         attributes: ['id', 'title', 'description', 'init_date', 'end_date', 'rules', 'public', 'key'],
         limit: limit,
         offset: offset,
-        order: [
-            ['init_date', 'DESC']
-        ]
+        order: order
     }).then((response) => {
         meta.totalPages = Math.ceil(response.count / limit)
         meta.totalItems = response.count
@@ -396,6 +414,38 @@ function hasPermission(user_id, contest_id, cb) {
     })
 }
 
+function getContestsByInstitution(req, res){
+    let limit = (req.query.limit) ? parseInt(req.query.limit) : 10
+    let offset = (req.query.page) ? limit * (parseInt(req.query.page) - 1) : 0
+    let idInstitution = req.params.idInstitution;
+
+    let condition = {}
+    let meta = {}
+
+    condition.institution_id = idInstitution
+
+    sequelize.query(
+        'select distinct contests.id, contests.title, contests.public, contests.init_date from contests as contests' +
+        " inner join contests_problems as cprob on cprob.contest_id = contests.id " +
+        "inner join submissions as submissions on cprob.id = submissions.contest_problem_id " +
+        "inner join users as users on submissions.user_id = users.id && users.institution_id =" +idInstitution+
+        " group by contests.id, submissions.id, users.id order by contests.id " +
+        " LIMIT "+ offset+ ", "+limit, {   type: Sequelize.QueryTypes.SELECT }
+    )
+    .then((response) => {
+        console.log(response.count)
+        meta.totalItems = response.length
+        meta.totalPages = Math.ceil(response.length / limit)
+
+        if (offset >= response[0].count) {
+            return res.status(200).send({ meta })
+        }
+        res.status(200).send({ meta: meta, data: response})
+    }).catch((err) => {
+        return res.status(500).send({ error: `${err}` })
+    })
+}
+
 module.exports = {
     create,
     index,
@@ -408,5 +458,6 @@ module.exports = {
     registerStudent,
     removeStudent,
     isRegister,
-    hasPermission
+    hasPermission,
+    getContestsByInstitution
 }

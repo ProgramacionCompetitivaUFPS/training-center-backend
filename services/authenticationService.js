@@ -19,6 +19,7 @@ function createToken(user) {
         sub: user.id,
         username: user.username,
         usertype: user.type,
+        institution: user.institution_id,
         iat: moment().unix(),
         exp: moment().add(7, 'days').unix()
     }
