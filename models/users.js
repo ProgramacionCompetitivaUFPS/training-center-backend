@@ -173,18 +173,11 @@ module.exports = function(sequelize, DataTypes) {
  * @param {any} callback
  * @returns
  */
-var hashPassword = function(user, options, callback) {
+var hashPassword = async (user) => {
     user.email = user.email.toLowerCase()
-
-    if (!user.changed('password')) return callback()
-
-    if (user.password != user.confirm_password) {
-        throw new Error("Las contraseñas no coinciden");
+    if (user.changed('password')) {
+     const salt = await bcrypt.genSaltSync(10, 'a');
+     const hash = bcrypt.hashSync(user.password, salt);
+     user.set('password', hash)
     }
-
-    bcrypt.hash(user.get('password'), bcrypt.genSaltSync(10), null, (err, hash) => {
-        if (err) return callback(err);
-        user.set('password', hash);
-        return callback(null, options);
-    })
 }
