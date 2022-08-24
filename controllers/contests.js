@@ -58,9 +58,11 @@ function index(req, res) {
             where: {
                 id: req.params.id
             },
-            include: [
-                { model: User, attributes: ['name', 'id', 'username','email'] },
-            ]
+            include: [{
+                model: User,
+                attributes: ['name', 'id', 'username', 'email']
+            }],
+            attributes: ['id', 'title', 'description', 'init_date', 'end_date', 'rules', 'public', 'key']
         })
         .then((contest) => {
             return res.status(200).send({ contest })
@@ -196,9 +198,15 @@ function addProblems(req, res) {
             if (init_date < moment())
                 return res.status(400).send({ error: 'No se puede modificar una maraton que ya inició' })
 
-            contest.addProblems(req.body.problems).then((problems) => {
+                const contest_problems = []
+                req.body.problems.forEach(problem => {
+                    contest_problems.push({problem_id: problem, contest_id: contest.id});
+                })
+
+                ContestProblems.bulkCreate(contest_problems).then((problems) =>{
                 return res.sendStatus(201)
             }).catch((err) => {
+                console.log(err)
                 return res.sendStatus(500)
             })
         })
@@ -255,9 +263,12 @@ function registerStudent(req, res) {
             if (end_date < moment())
                 return res.status(400).send({ error: 'No se puede registrar en una maraton que ya acabo' })
 
-            contest.addUsers(req.user.sub).then((user) => {
+            const contest_student = {user_id: req.user.sub, contest_id: contest.id}
+
+            ContestStudent.create(contest_student).then((user) => {
                 return res.sendStatus(201)
             }).catch((err) => {
+                console.log(err)
                 return res.sendStatus(500)
             })
         })
@@ -433,7 +444,6 @@ function getContestsByInstitution(req, res){
         " LIMIT "+ offset+ ", "+limit, {   type: Sequelize.QueryTypes.SELECT }
     )
     .then((response) => {
-        console.log(response.count)
         meta.totalItems = response.length
         meta.totalPages = Math.ceil(response.length / limit)
 

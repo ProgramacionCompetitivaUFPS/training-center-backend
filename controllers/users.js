@@ -310,7 +310,7 @@ function getSubmissions(req, res) {
         include: [
             { model: Problems, attributes: ['title_en', 'id', 'title_es', 'level'] }
         ],
-        attributes: ['id', 'language', 'file_name', 'execution_time', 'verdict', 'status', 'created_at'],
+        attributes: ['id', 'language', 'file_name', 'execution_time', 'verdict', 'status', 'created_at', 'blockly_file_name'],
         limit: limit,
         order: order,
         offset: offset,
@@ -338,7 +338,7 @@ function getSubmissionsbyContest(req, res) {
         return res.status(401).send({ error: 'No se encuentra autorizado' });
     }
 
-    sequelize.query(`SELECT s.id, s.language, s.file_name, s.execution_time, s.verdict, s.status, s.created_at, s.user_id,
+    sequelize.query(`SELECT s.id, s.language, s.file_name, s.execution_time, s.verdict, s.status, s.created_at, s.user_id, s.blockly_file_name,
     p.id as pid, p.title_en, p.title_es, p.level,
     cp.contest_id,
     us.name, us.username
