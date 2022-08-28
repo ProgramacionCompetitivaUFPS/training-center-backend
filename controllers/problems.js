@@ -348,9 +348,6 @@ function submit(req, res) {
 
     Submission.create(req.body)
         .then(submission => {
-            
-            // Cambio lenguaje de ejecucion para bloques
-            if(submission.language === 'Blockly') submission.language = 'Python'
         
             Grader.judge(submission.id, isContest, fileNameExecution, filePathExecution)
             return res.status(200).send(submission)

@@ -41,6 +41,8 @@ function judge( submission_id, contest, fileNameExecution, filePathExecution) {
                 file_xml_path = res.file_path.substring(n, res.file_path.length )
             }
 
+            let language = data.language === 'Blockly' ? 'Python': data.language
+
             let execution = new Sandbox(
                 file_path,
                 fileNameExecution,
@@ -48,7 +50,7 @@ function judge( submission_id, contest, fileNameExecution, filePathExecution) {
                 data.time_limit,
                 input_path,
                 output_path,
-                data.language,
+                language,
                 input_filename,
                 output_filename,
                 file_xml_name,
