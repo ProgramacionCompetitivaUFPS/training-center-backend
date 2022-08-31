@@ -111,8 +111,8 @@ function register(req, res) {
             return res.sendStatus(201)
         })
         .catch(error => {
+            console.err(error)
             error = _.omit(error, ['parent', 'original', 'sql'])
-            
             return res.status(400).send(error)
         })
 }

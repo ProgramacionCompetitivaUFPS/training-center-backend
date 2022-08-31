@@ -53,16 +53,17 @@ function create(req, res) {
     if (req.user.usertype != 2) {
         return res.status(401).send({ error: 'No se encuentra autorizado' })
     }
-
-    if (!req.body.name) {
+    if (!req.body.name || !req.body.type_category) {
         return res.status(400).send({ error: 'Datos incompletos' })
     }
 
+    req.body.type = req.body.type_category
     Category.create(req.body)
         .then(category => {
             return res.sendStatus(201)
         })
         .catch(error => {
+            console.log(error)
             error = _.omit(error, ['parent', 'original', 'sql'])
             return res.status(400).send(error)
         })
