@@ -358,6 +358,12 @@ function submit(req, res) {
         })
 }
 
+/**
+ * obtener tipo de categoría del problema (colegio, univercisad)
+ * @param {*} req 
+ * @param {*} res 
+ * @returns 
+ */
 function validateCategory(req, res){
 
     Category.findOne({
