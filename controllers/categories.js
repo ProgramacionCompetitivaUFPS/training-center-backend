@@ -4,7 +4,11 @@ const Category = require("../models").categories;
 const Material = require("../models").material;
 const _ = require("lodash");
 
+const env = process.env.NODE_ENV || "development";
+const config = require("../config/config.js")[env];
+
 const Sequelize = require("sequelize");
+const sequelize = new Sequelize(config.url, config);
 const Op = Sequelize.Op;
 
 /**
@@ -26,10 +30,12 @@ function index(req, res) {
   }
 
   if (req.query.material) {
-    condition.id = Sequelize.literal( //USAR SUBQUERY
-      "SELECT category_id from Materials where id = ",
-      req.query.material
-    );
+    condition.id = {
+      [Op.eq]: Sequelize.literal(
+        `(SELECT category_id FROM materials 
+         WHERE id = ${req.query.material})`
+      ),
+    };
   }
 
   Category.findAll({
@@ -39,7 +45,7 @@ function index(req, res) {
       return res.status(200).send({ categories });
     })
     .catch((err) => {
-      console.log(err)
+      console.log(err);
       return res.status(500).send({ error: `${err}` });
     });
 }
@@ -117,31 +123,23 @@ function update(req, res) {
     });
 }
 
-/**
- * obtener categoría por material
- * @param {*} req
- * @param {*} res
- * @returns
- */
-function findByMaterial(req, res) {
-  console.log("ACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
-  let condition = {};
-  condition.id = Sequelize.literal(
-    `SELECT category_id from Materials where id = ${req.params.materialId}`)
+function get(req, res) {
   Category.findOne({
-    where:
-      condition,
-  })
-    .then((category) => {
-      return res.status(200).send({ type: category.type });
-    })
-    .catch((err) => {
-      console.log(err)
-      return res.status(500).send({ error: `${err}` });
-    });
-
-  return true;
+          where: {
+              id: req.params.id
+          }
+      })
+      .then((category) => {
+          if (!category) return res.status(404).send({ error: 'Material no encontrado' })
+          return res.status(200).send({ category })
+      })
+      .catch((err) => {
+          console.log(err)
+          return res.status(500).send({ error: `${err}` })
+      })
 }
+
+
 
 module.exports = {
   index,
@@ -149,5 +147,5 @@ module.exports = {
   create,
   remove,
   update,
-  findByMaterial
+  get
 };
