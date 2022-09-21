@@ -241,14 +241,19 @@ function registerStudent(req, res) {
 
             if (!syllabus.public && req.body.key != syllabus.key)
                 return res.status(401).send({ error: 'Clave del syllabus incorrecta' })
+              
+                const syllabus_student = {user_id: req.user.sub, syllabus_id: syllabus.id}
 
-            syllabus.addUsers(req.user.sub).then((user) => {
+                SyllabusStudent.create(syllabus_student).then((user) => {
+
                 return res.sendStatus(201)
             }).catch((err) => {
+                console.error(err)
                 return res.sendStatus(500)
             })
         })
         .catch((err) => {
+            console.error(err)
             return res.status(500).send({ error: `${err}` })
         })
 }

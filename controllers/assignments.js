@@ -1,6 +1,7 @@
 'use strict'
 
 const Assignment = require('../models').assignments
+const AssignmentProblems = require('../models').assignement_problems
 const Submissions = require('../models').submissions
 const SyllabusStudents = require('../models').syllabus_students
 const Syllabus = require('../models').syllabuses
@@ -22,13 +23,25 @@ function create(req, res) {
     Assignment.create(req.body)
         .then(assignment => {
             if (req.body.problems.length > 0) {
-                assignment.addProblems(req.body.problems).then((materials) => {
+                
+                const assignement_problems = []
+                req.body.problems.forEach(problem => {
+                    console.log("problemaaaaa", problem, assignment.id)
+                    assignement_problems.push({problem_id: problem, assignment_id: assignment.id});
+                })
+                console.log(assignement_problems)
+
+                AssignmentProblems.bulkCreate(assignement_problems).then((problems) =>{
                     return res.sendStatus(201)
+                }).catch((err) => {
+                    console.error(err)
+                    return res.sendStatus(500)
                 })
             } else
                 return res.sendStatus(201)
         })
         .catch(error => {
+            console.error(error)
             error = _.omit(error, ['parent', 'original', 'sql'])
             return res.status(400).send(error)
         })
