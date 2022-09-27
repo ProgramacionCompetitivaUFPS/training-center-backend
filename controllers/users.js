@@ -5,6 +5,7 @@ const Institutions = require('../models').institutions
 const Submissions = require('../models').submissions
 const Syllabus = require('../models').syllabuses
 const Problems = require('../models').problems
+const Categories = require('../models').categories
 const authService = require('../services/authenticationService')
 const path = require('path')
 const _ = require('lodash');
@@ -274,8 +275,6 @@ function getSyllabus(req, res) {
 }
 
 function getSubmissions(req, res) {
-    /*if (req.params.id != req.user.sub)
-        return res.status(401).send({ error: 'No se encuentra autorizado' })*/
 
     if (!req.query.page)
         return res.status(400).send({ error: 'Datos incompletos' })
@@ -308,7 +307,15 @@ function getSubmissions(req, res) {
     Submissions.findAndCountAll({
         where: condition,
         include: [
-            { model: Problems, attributes: ['title_en', 'id', 'title_es', 'level'] }
+            { 
+                model: Problems, 
+                attributes: ['title_en', 'id', 'title_es', 'level'],
+                include: [{
+                    model: Categories,
+                    attributes: ['name', 'type'],
+                    required: true
+                }] 
+            }
         ],
         attributes: ['id', 'language', 'file_name', 'execution_time', 'verdict', 'status', 'created_at', 'blockly_file_name'],
         limit: limit,
@@ -324,6 +331,7 @@ function getSubmissions(req, res) {
             return res.status(200).send({ meta: meta, data: response.rows })
         })
         .catch((err) => {
+            console.error(err)
             return res.status(500).send({ error: `${err}` })
         })
 }
