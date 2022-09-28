@@ -332,6 +332,9 @@ function list(req, res) {
         condition.id = {
             [Op.ne]: null
         }
+    if (req.query.type){
+        condition.type = req.query.type
+    }
     if (req.query.filter) {
         if (req.query.filter == 'private') condition.public = false
         else condition.public = true
@@ -362,7 +365,7 @@ function list(req, res) {
             [
                 { model: User, attributes: ['name', 'id', 'username','email'] },
             ],
-        attributes: ['id', 'title', 'description', 'init_date', 'end_date', 'rules', 'public', 'key'],
+        attributes: ['id', 'title', 'description', 'init_date', 'end_date', 'rules', 'public', 'key', 'type'],
         limit: limit,
         offset: offset,
         order: order
@@ -375,6 +378,7 @@ function list(req, res) {
         }
         res.status(200).send({ meta: meta, data: response.rows })
     }).catch((err) => {
+        console.error(err)
         return res.status(500).send({ error: `${err}` })
     })
 }

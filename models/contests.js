@@ -36,6 +36,10 @@ module.exports = (sequelize, DataTypes) => {
                 key: 'id'
             }
         },
+        type: {
+            allowNull: false,
+            type: DataTypes.INTEGER
+        },
         public: {
             allowNull: false,
             type: DataTypes.BOOLEAN
