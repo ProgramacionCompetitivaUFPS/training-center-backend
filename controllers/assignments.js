@@ -1,7 +1,7 @@
 'use strict'
 
 const Assignment = require('../models').assignments
-const AssignmentProblems = require('../models').assignement_problems
+const AssignmentProblems = require('../models').assignment_problems
 const Submissions = require('../models').submissions
 const SyllabusStudents = require('../models').syllabus_students
 const Syllabus = require('../models').syllabuses

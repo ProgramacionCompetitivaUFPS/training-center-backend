@@ -5,6 +5,7 @@ const User = require('../models').users
 const Assignment = require('../models').assignments
 const Material = require('../models').materials
 const SyllabusStudent = require('../models').syllabus_students
+const SyllabusMaterial = require('../models').syllabus_materials
 const _ = require('lodash')
 
 const Sequelize = require('sequelize')
@@ -173,8 +174,13 @@ function assignMaterialsToSyllabus(req, res) {
         .then((syllabus) => {
             if (req.user.sub != syllabus.user_id)
                 return res.status(401).send({ error: 'No se encuentra autorizado' })
-
-            syllabus.addMaterials(req.body.materials).then((materials) => {
+                
+            const syllabus_materials = []
+                req.body.materials.forEach(material => {
+                    syllabus_materials.push({material_id: material, syllabus_id: syllabus.id});
+                    })
+    
+            SyllabusMaterial.bulkCreate(syllabus_materials).then((materials) => {
                 return res.sendStatus(201)
             }).catch((err) => {
                 return res.sendStatus(500)
