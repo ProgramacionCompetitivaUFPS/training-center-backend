@@ -136,11 +136,23 @@ function addProblems(req, res) {
 
     Assignment.findByPk(req.params.id)
         .then((assignment) => {
-            assignment.addProblems(req.body.problems).then((problems) => {
+            console.log("estoy aquiii")
+            const assignement_problems = []
+            req.body.problems.forEach(problem => {
+                assignement_problems.push({problem_id: problem, assignment_id: assignment.id});
+                })
+
+            console.log(assignement_problems)
+
+            AssignmentProblems.bulkCreate(assignement_problems).then((problems) =>{
                 return res.sendStatus(201)
+            }).catch((err) => {
+                console.error(err)
+                return res.sendStatus(500)
             })
         })
         .catch((err) => {
+            console.error(err)
             return res.status(500).send({ error: `${err}` })
         })
 }

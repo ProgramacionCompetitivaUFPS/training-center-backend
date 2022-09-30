@@ -48,6 +48,7 @@ function create(req, res) {
             return res.sendStatus(201)
         })
         .catch(error => {
+            console.error(error)
             error = _.omit(error, ['parent', 'original', 'sql'])
             return res.status(500).send(error)
         })
@@ -62,7 +63,7 @@ function index(req, res) {
                 model: User,
                 attributes: ['name', 'id', 'username', 'email']
             }],
-            attributes: ['id', 'title', 'description', 'init_date', 'end_date', 'rules', 'public', 'key']
+            attributes: ['id', 'title', 'description', 'init_date', 'end_date', 'rules', 'public','type', 'key']
         })
         .then((contest) => {
             return res.status(200).send({ contest })
@@ -92,7 +93,6 @@ function update(req, res) {
         return res.status(400).send({ error: 'La duración mínima de la maraton debe ser 30 minutos' })
 
     req.body.user_id = req.user.sub
-
     Contest.findByPk(req.params.id).then(contest => {
         let init_date = moment(contest.init_date)
         let end_date = moment(contest.end_date)
@@ -113,9 +113,11 @@ function update(req, res) {
         ).then(updated => {
             return res.status(200).send(req.body)
         }).catch((err) => {
+            console.error(err)
             return res.sendStatus(500)
         })
     }).catch((err) => {
+        console.error(err)
         return res.sendStatus(500)
     })
 }
