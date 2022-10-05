@@ -139,7 +139,8 @@ function get(req, res) {
                         verdict: 'Accepted'
                     },
                     required: false
-                }
+                },
+                { model: Category, attributes: ['name', 'id', 'type'] },
             ],
             attributes: ['id', 'title_es', 'title_en', 'level', 'description_en', 'description_es',
                 'example_input', 'example_output', 'category_id', 'user_id', 'time_limit'
