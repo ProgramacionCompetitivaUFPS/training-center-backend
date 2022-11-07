@@ -159,6 +159,9 @@ function list(req, res) {
     let order = []
     let offset = (req.query.page) ? limit * (parseInt(req.query.page) - 1) : 0
     let by = (req.query.by) ? req.query.by : 'ASC'
+    let typeCategory = (req.query.typeCategory)
+
+    console.log("typeCategory "+typeCategory)
 
     let condition = {}
     let meta = {}
@@ -178,9 +181,9 @@ function list(req, res) {
                 }
             }
         }
-    } else if (!req.query.search)
+    } else if (!req.query.search){
         return res.status(400).send({ error: 'No se ha proporcionado un termino para buscar' })
-    else {
+    }else{
 
         req.query.search = '%' + req.query.search + '%'
         if (req.query.filter) {
@@ -240,6 +243,16 @@ function list(req, res) {
                 },
             ]
         }
+    }
+
+    if(typeCategory){
+        console.log("entrooooooo buscar por tipo categoria")
+        condition.category_id = {
+            [Op.in]: Sequelize.literal(
+              `(SELECT id FROM categories 
+               WHERE type = ${typeCategory})`
+            ),
+          };
     }
 
     if (req.query.sort) {
