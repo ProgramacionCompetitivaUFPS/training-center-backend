@@ -1,6 +1,7 @@
 'use strict'
 
 const Contest = require('../models').contests
+const Enums = require('../helpers/enums')
 const ContestProblems = require('../models').contests_problems
 const Submissions = require('../models').submissions
 const Problem = require('../models').problems
@@ -183,6 +184,12 @@ function getProblems(req, res) {
     })
 }
 
+/**
+ * Agregar problemas a la maratón
+ * @param {*} req 
+ * @param {*} res 
+ * @returns 
+ */
 function addProblems(req, res) {
     if (!req.body.problems)
         return res.status(400).send({ error: 'Datos incompletos' })
@@ -201,16 +208,54 @@ function addProblems(req, res) {
                 return res.status(400).send({ error: 'No se puede modificar una maraton que ya inició' })
 
                 const contest_problems = []
-                req.body.problems.forEach(problem => {
-                    contest_problems.push({problem_id: problem, contest_id: contest.id});
-                })
+                const contest_type = Enums.typeContest.getName(contest.type)
+                
+                //validar que el tipo de maratón sea correspondiente al tipo de problema que va a guardar
+                var validate_problems = new Promise((resolve, reject) => {
+                    req.body.problems.forEach((problem_id, index, array) => {
+                        Problem.findOne({
+                            where: {
+                                id: problem_id
+                            },
+                            include: [
+                                { model: Category, attributes: ['name', 'id', 'type'] },
+                            ]
+                        })
+                        .then((problem) => {
+                            const problem_type = Enums.typeCategory.getName(problem.category.type)
+                            
+                            if(problem_type !== contest_type){
+                               
+                                const contest_type_spanish = Enums.typeContest.getNameSpanish(contest.type)
 
-                ContestProblems.bulkCreate(contest_problems).then((problems) =>{
-                return res.sendStatus(201)
-            }).catch((err) => {
-                console.log(err)
-                return res.sendStatus(500)
-            })
+                                reject ({status:400, error: 'No se puede agregar un problema de tipo diferente en una maratón de '+ contest_type_spanish})
+                            }
+                            
+                            
+                            contest_problems.push({problem_id: problem_id, contest_id: contest.id});
+
+                            if (index === array.length -1){
+                                resolve()
+                            }
+
+                        }).catch((err) => {
+                            console.log(err)
+                            reject({status:500, error: err})
+                        })
+                    })
+                })
+                
+                validate_problems.then((validate) => {
+                    ContestProblems.bulkCreate(contest_problems).then((problems) =>{
+                        return res.sendStatus(201)
+                    }).catch((err) => {
+                        console.log(err)
+                        return res.sendStatus(500)
+                    })
+                }).catch((err) =>{
+                    console.log(err)
+                    return res.status(err.status).send({ error: err.error })
+                })
         })
         .catch((err) => {
             return res.status(500).send({ error: `${err}` })
