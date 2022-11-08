@@ -283,6 +283,11 @@ function list(req, res) {
                         verdict: 'Accepted'
                     },
                     required: false
+                },
+                {   
+                    model: Category,
+                    attributes: ['id', 'name', 'type'],
+                    required: true
                 }],
                 limit: limit,
                 order: order,
@@ -304,7 +309,7 @@ function list(req, res) {
         Problem.findAndCountAll({
             where: condition,
             distinct: 'id',
-            attributes: ['id', 'title_es', 'title_en', 'level'],
+            attributes: ['id', 'title_es', 'title_en', 'level', 'category_id'],
             limit: limit,
             include: [{
                 model: Submission,
@@ -315,6 +320,11 @@ function list(req, res) {
                     verdict: 'Accepted'
                 },
                 required: false
+            },
+            {
+                model: Category,
+                attributes: ['id', 'name', 'type'],
+                required: true
             }],
             order: order,
             offset: offset,
@@ -327,6 +337,7 @@ function list(req, res) {
             }
             res.status(200).send({ meta: meta, data: response.rows })
         }).catch((err) => {
+            console.log(err)
             res.sendStatus(500)
         })
     }
