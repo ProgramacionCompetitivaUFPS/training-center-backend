@@ -61,10 +61,6 @@ module.exports = function(sequelize, DataTypes) {
             allowNull: true,
             type: DataTypes.INTEGER
         },
-        solution_url: {
-            allowNull: true,
-            type: DataTypes.STRING
-        },
         category_id: {
             allowNull: false,
             type: DataTypes.INTEGER,
