@@ -22,8 +22,6 @@ class Sandbox {
     this.execution_directory = path.join( this.path, 'files', folder )
     this.config = new Config()
 
-    console.log("***************NEW SANDBOX ****************")
-    console.log(this)
 
     this.configureLanguage()
   }
@@ -68,18 +66,14 @@ class Sandbox {
 
     //agregando unos comandos adicionales
     if(this.file_xml_name !== '' && this.file_xml_path !== ''){
-      console.log('ENTRO ACAAAAAAAA')
       script += ' && cp ' + path.join(this.path, this.file_xml_path) + ' ' + this.execution_directory + /* Copia el source de la submission en bloques */
       ' && rm -rf ' + path.join(this.path, this.file_path)// eliminar el source en codigo fuente 
     }
 
-    console.log("*********PREPARAR ARCHIVOS: ************")
-    console.log(script)
-
     exec(script, (error, stdout, stderr) => {
             if (error) {
                 console.log("*************    HAN OCURRIDO ERRORES  *************")
-                console.log( stderr )
+                console.error( stderr )
                 this.removeExecutionFolder()
             } else success()
         }
@@ -107,14 +101,14 @@ class Sandbox {
 
     exec(ins, (error, stdout, stderr) => {
       if (error) {
-        console.log(error)
-        console.log(stderr)
+        console.error(error)
+        console.error(stderr)
         success('Compilation Error', '0')
         return
       }
       exec('docker exec ' + container + ' /files/' + this.folder + '/' + this.runner + '  ' + this.timeLimit, (error, stdout, stderr) => {
-        console.log(error)
-        console.log(stderr)
+        console.error(error)
+        console.error(stderr)
         let ans = stdout.split('\n')[0]
         let tmp = stderr.split('\n')
         let execTime

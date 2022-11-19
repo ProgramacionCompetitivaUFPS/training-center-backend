@@ -239,7 +239,7 @@ function addProblems(req, res) {
                             }
 
                         }).catch((err) => {
-                            console.log(err)
+                            console.error(err)
                             reject({status:500, error: err})
                         })
                     })
@@ -249,11 +249,11 @@ function addProblems(req, res) {
                     ContestProblems.bulkCreate(contest_problems).then((problems) =>{
                         return res.sendStatus(201)
                     }).catch((err) => {
-                        console.log(err)
+                        console.error(err)
                         return res.sendStatus(500)
                     })
                 }).catch((err) =>{
-                    console.log(err)
+                    console.error(err)
                     return res.status(err.status).send({ error: err.error })
                 })
         })
@@ -315,7 +315,7 @@ function registerStudent(req, res) {
             ContestStudent.create(contest_student).then((user) => {
                 return res.sendStatus(201)
             }).catch((err) => {
-                console.log(err)
+                console.error(err)
                 return res.sendStatus(500)
             })
         })

@@ -45,7 +45,7 @@ function index(req, res) {
       return res.status(200).send({ categories });
     })
     .catch((err) => {
-      console.log(err);
+      console.error(err);
       return res.status(500).send({ error: `${err}` });
     });
 }
@@ -74,7 +74,7 @@ function create(req, res) {
       return res.sendStatus(201);
     })
     .catch((error) => {
-      console.log(error);
+      console.error(error);
       error = _.omit(error, ["parent", "original", "sql"]);
       return res.status(400).send(error);
     });
@@ -134,7 +134,7 @@ function get(req, res) {
           return res.status(200).send({ category })
       })
       .catch((err) => {
-          console.log(err)
+          console.error(err)
           return res.status(500).send({ error: `${err}` })
       })
 }

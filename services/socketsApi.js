@@ -32,7 +32,6 @@ platform.on('connection', function(socket) {
 
 socketApi.notifySubmissionResult = function(user_id, problem_id, verdict, problem_name) {
     getSocket(user_id, (socket_id) => {
-        console.log('Socket ENVIO: ' + socket_id)
         platform.to(socket_id).emit('new result', {
             user_id: user_id,
             problem_id: problem_id,
@@ -66,7 +65,7 @@ socketApi.refreshScoreboard = function(user_id, problem_id, verdict, submission_
 
 function addSocket(user_id, socket_id) {
     User.update({ socket_id: socket_id }, { where: { id: user_id } }).then((affectedRows) => {}).catch((err) => {
-        console.log('ADD SOCKET ERROR: ' + err)
+        console.error('ADD SOCKET ERROR: ' + err)
     })
 }
 
@@ -76,7 +75,7 @@ function getSocket(user_id, success) {
             success(user.socket_id)
         })
         .catch((err) => {
-            console.log('GET SOCKET ERROR: ' + err)
+            console.error('GET SOCKET ERROR: ' + err)
         })
 }
 

@@ -161,8 +161,6 @@ function list(req, res) {
     let by = (req.query.by) ? req.query.by : 'ASC'
     let typeCategory = (req.query.typeCategory)
 
-    console.log("typeCategory "+typeCategory)
-
     let condition = {}
     let meta = {}
 
@@ -246,7 +244,6 @@ function list(req, res) {
     }
 
     if(typeCategory){
-        console.log("entrooooooo buscar por tipo categoria")
         condition.category_id = {
             [Op.in]: Sequelize.literal(
               `(SELECT id FROM categories 
@@ -337,7 +334,7 @@ function list(req, res) {
             }
             res.status(200).send({ meta: meta, data: response.rows })
         }).catch((err) => {
-            console.log(err)
+            console.error(err)
             res.sendStatus(500)
         })
     }
@@ -348,9 +345,6 @@ function submit(req, res) {
         return res.status(401).send({ error: 'No se encuentra autorizado' })
 
     req.body = req.body.data
-
-    console.log("************** INFORMACION DE LOS ARCHIVOS *****************");
-    console.log(req.files)
 
     if (!req.files['code'] || !req.body.language)
         return res.status(400).send({ error: 'Datos incompletos' })
@@ -366,7 +360,6 @@ function submit(req, res) {
     req.body.file_path = filePathExecution
 
     if(req.files['svgBlocklyCode']){
-        console.log('svg COOOooooooooooooooooooooooooooooooooooooODE', req.files['svgBlocklyCode'])
         req.body.blockly_file_name = req.files['svgBlocklyCode'][0].filename
     }
     
