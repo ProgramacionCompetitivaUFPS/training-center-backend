@@ -64,7 +64,6 @@ var submissionsDataFilter = function (req, file, cb) {
             return cb( new Error('El formato para la subida de soluciones en blockly es incorrecto') )
         }
     }else if(file.fieldname == 'code'){
-        console.log('entro aki', ext)
         if(ext !== '.cpp' && ext !== '.cc' && ext !== '.cxx' && ext !== '.c' && ext !== '.cp' && ext !== '.java' && ext !== '.py') {
 
             return cb( new Error('Sólo estan permitidos archivos .cpp, .java y .py') ) 

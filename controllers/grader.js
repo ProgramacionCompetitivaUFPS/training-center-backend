@@ -15,8 +15,6 @@ const socket = require('../services/socketsApi')
 function judge( submission_id, contest, fileNameExecution, filePathExecution) {
     getSubmissionData( submission_id, (res) =>{
         let data = res
-
-        console.log(data)
         
         getProblemData( data, () => {
             //url de la ruta donde se almaceno el archivo desde /files
@@ -41,6 +39,8 @@ function judge( submission_id, contest, fileNameExecution, filePathExecution) {
                 file_xml_path = res.file_path.substring(n, res.file_path.length )
             }
 
+            let language = data.language === 'Blockly' ? 'Python': data.language
+
             let execution = new Sandbox(
                 file_path,
                 fileNameExecution,
@@ -48,7 +48,7 @@ function judge( submission_id, contest, fileNameExecution, filePathExecution) {
                 data.time_limit,
                 input_path,
                 output_path,
-                data.language,
+                language,
                 input_filename,
                 output_filename,
                 file_xml_name,
@@ -56,7 +56,6 @@ function judge( submission_id, contest, fileNameExecution, filePathExecution) {
             )
 
             execution.checkStatus( ( status ) => {
-                
                 if( status ){
                     console.log( "************** CONTENEDOR EJECUTANDOSE **********")
                     updateStatus( submission_id, { status: 'running'} )
@@ -73,8 +72,11 @@ function judge( submission_id, contest, fileNameExecution, filePathExecution) {
                         updateStatus( submission_id, ans )
                         //user, problem, verdict, sumission_id
                         if( contest ) socket.refreshScoreboard( data.user_id, data.problem_id, ans.verdict, submission_id, data.problem_title, data.created_at )
+                       
                         socket.notifySubmissionResult( data.user_id, data.problem_id, ans.verdict, data.problem_title )
                     })
+                }else{
+                    socket.notifySubmissionResult( data.user_id, data.problem_id, null, data.problem_title )
                 }
                 console.log( "************** CONTENEDOR NO EN EJECUCION **********")
             })
@@ -97,8 +99,8 @@ function getSubmissionData( submission_id, cb ){
         }
         cb( data )
     }).catch( (err) => {
-        console.log( "Error trayendo el envio")
-        console.log(err)
+        console.error( "Error trayendo el envio")
+        console.error(err)
     } )
 }
 
@@ -114,8 +116,8 @@ function getProblemData( data, cb ){
         else data.problem_title = problem.title_es
         cb()
     }).catch( (err) => {
-        console.log( "Error trayendo el problema")
-        console.log(err)
+        console.error( "Error trayendo el problema")
+        console.error(err)
     } )
 }
 
@@ -126,7 +128,7 @@ function updateStatus( submission_id, data ){
             where: { id: submission_id }
         }
     ).catch((err) => {
-        console.log('Ocurrió un error actualizando el estado del envio')
+        console.error('Ocurrió un error actualizando el estado del envio')
     })
 }
 

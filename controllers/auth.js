@@ -16,7 +16,6 @@ const moment = require('moment')
  * @param {any} res
  */
 function signIn(req, res) {
-    console.log(req)
     if (!req.body.email || !req.body.password) {
         res.status(400).send({ error: 'Datos incompletos' })
     }
@@ -26,12 +25,19 @@ function signIn(req, res) {
             email: req.body.email
         }
     }).then(function(user) {
-        if (user.authenticate(req.body.password))
-            res.status(200).send({ token: authService.createToken(user) })
-        else
+        if (user.authenticate(req.body.password)){
+            if(user.institution_id === null){
+                res.status(200).send({ token: authService.createToken(user),
+                    actualizado: -1});
+            } else { 
+                res.status(200).send({ token: authService.createToken(user),
+                    actualizado: user.institution_id});
+            }
+        } else
             res.status(401).send({ error: 'Contraseña incorrecta' })
 
     }).catch(function(err) {
+        console.error(err)
         res.status(401).send({ error: 'Email incorrecto' })
     })
 }
@@ -71,7 +77,6 @@ function recovery(req, res) {
                 return res.sendStatus(200)
             }, (err) => {
                 if (err)
-                //console.log(err)
                     return res.sendStatus(500)
             })
         })

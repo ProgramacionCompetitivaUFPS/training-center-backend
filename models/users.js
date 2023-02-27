@@ -84,10 +84,10 @@ module.exports = function(sequelize, DataTypes) {
             type: DataTypes.INTEGER,
             allowNull: true
         },
-        institution: {
-            type: DataTypes.STRING,
-            allowNull: true
-        },
+        // institution: {
+        //     type: DataTypes.STRING,
+        //     allowNull: true
+        // },
         profile_image_url: {
             type: DataTypes.STRING,
             allowNull: true
@@ -95,6 +95,14 @@ module.exports = function(sequelize, DataTypes) {
         status_learning: {
             type: DataTypes.INTEGER,
             allowNull: true
+        },
+        institution_id: {
+            type: DataTypes.INTEGER,
+            allowNull: true,
+            references: {
+                model: 'institutions',
+                key: 'id'
+            }
         }
     }, {
         hooks: {
@@ -104,21 +112,19 @@ module.exports = function(sequelize, DataTypes) {
         underscored: true,
         underscoredAll: true,
     });
-
     //Class methods
-
     Users.associate = (models) => {
         Users.hasMany(models.problems, { as: 'problems' })
 
         Users.hasMany(models.materials, { as: 'materials' })
 
-        Users.hasMany(models.posts, { as: 'posts' })
-
-        Users.hasMany(models.reports_forums, { as: 'reports_forums' })
-
-        Users.hasMany(models.forums, { as: 'forums' })
-
         Users.hasMany(models.submissions, { as: 'submissions' })
+
+        Users.belongsTo(models.institutions, {
+            foreignKey: {
+                allowNull: true,
+            }
+        })
 
         Users.belongsToMany(models.syllabuses, {
             through: 'syllabus_students',
@@ -128,12 +134,6 @@ module.exports = function(sequelize, DataTypes) {
         Users.belongsToMany(models.contests, {
             through: 'contests_students',
             as: 'contests',
-            onDelete: 'CASCADE'
-        })
-
-        Users.belongsToMany(models.teams, {
-            through: 'users_teams',
-            as: 'teams',
             onDelete: 'CASCADE'
         })
     }
@@ -173,18 +173,11 @@ module.exports = function(sequelize, DataTypes) {
  * @param {any} callback
  * @returns
  */
-var hashPassword = function(user, options, callback) {
+var hashPassword = async (user) => {
     user.email = user.email.toLowerCase()
-
-    if (!user.changed('password')) return callback()
-
-    if (user.password != user.confirm_password) {
-        throw new Error("Las contraseñas no coinciden");
+    if (user.changed('password')) {
+     const salt = await bcrypt.genSaltSync(10, 'a');
+     const hash = bcrypt.hashSync(user.password, salt);
+     user.set('password', hash)
     }
-
-    bcrypt.hash(user.get('password'), bcrypt.genSaltSync(10), null, (err, hash) => {
-        if (err) return callback(err);
-        user.set('password', hash);
-        return callback(null, options);
-    })
 }

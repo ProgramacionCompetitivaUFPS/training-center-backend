@@ -68,6 +68,14 @@ module.exports = {
                 type: Sequelize.INTEGER,
                 allowNull: true
             },
+            institution_id: {
+                allowNull: false,
+                type: Sequelize.INTEGER,
+                references: {
+                    model: 'institutions',
+                    key: 'id'
+                }
+            },
         });
 
     },

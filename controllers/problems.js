@@ -30,6 +30,7 @@ function create(req, res) {
     req.body.category_id = req.body.category
     req.body.input = req.files['input'][0].path
     req.body.output = req.files['output'][0].path
+    req.body.userId = req.user.sub
     req.body.user_id = req.user.sub
 
     Problem.create(req.body)
@@ -37,6 +38,7 @@ function create(req, res) {
             return res.sendStatus(201)
         })
         .catch(error => {
+            console.error(error)
             error = _.omit(error, ['parent', 'original', 'sql'])
             return res.status(400).send(error)
         })
@@ -137,7 +139,8 @@ function get(req, res) {
                         verdict: 'Accepted'
                     },
                     required: false
-                }
+                },
+                { model: Category, attributes: ['name', 'id', 'type'] },
             ],
             attributes: ['id', 'title_es', 'title_en', 'level', 'description_en', 'description_es',
                 'example_input', 'example_output', 'category_id', 'user_id', 'time_limit'
@@ -156,6 +159,7 @@ function list(req, res) {
     let order = []
     let offset = (req.query.page) ? limit * (parseInt(req.query.page) - 1) : 0
     let by = (req.query.by) ? req.query.by : 'ASC'
+    let typeCategory = (req.query.typeCategory)
 
     let condition = {}
     let meta = {}
@@ -175,9 +179,9 @@ function list(req, res) {
                 }
             }
         }
-    } else if (!req.query.search)
+    } else if (!req.query.search){
         return res.status(400).send({ error: 'No se ha proporcionado un termino para buscar' })
-    else {
+    }else{
 
         req.query.search = '%' + req.query.search + '%'
         if (req.query.filter) {
@@ -239,6 +243,15 @@ function list(req, res) {
         }
     }
 
+    if(typeCategory){
+        condition.category_id = {
+            [Op.in]: Sequelize.literal(
+              `(SELECT id FROM categories 
+               WHERE type = ${typeCategory})`
+            ),
+          };
+    }
+
     if (req.query.sort) {
         if (req.query.sort == 'name')
             if (req.query.filter && req.query.filter == 'es')
@@ -257,7 +270,7 @@ function list(req, res) {
             Problem.findAndCountAll({
                 where: condition,
                 distinct: 'id',
-                attributes: ['id', 'title_es', 'title_en', 'level', 'user_id'],
+                attributes: ['id', 'title_es', 'title_en', 'level'],
                 include: [{
                     model: Submission,
                     as: 'submissions',
@@ -267,6 +280,11 @@ function list(req, res) {
                         verdict: 'Accepted'
                     },
                     required: false
+                },
+                {   
+                    model: Category,
+                    attributes: ['id', 'name', 'type'],
+                    required: true
                 }],
                 limit: limit,
                 order: order,
@@ -288,7 +306,7 @@ function list(req, res) {
         Problem.findAndCountAll({
             where: condition,
             distinct: 'id',
-            attributes: ['id', 'title_es', 'title_en', 'level', 'user_id'],
+            attributes: ['id', 'title_es', 'title_en', 'level', 'category_id'],
             limit: limit,
             include: [{
                 model: Submission,
@@ -299,6 +317,11 @@ function list(req, res) {
                     verdict: 'Accepted'
                 },
                 required: false
+            },
+            {
+                model: Category,
+                attributes: ['id', 'name', 'type'],
+                required: true
             }],
             order: order,
             offset: offset,
@@ -311,6 +334,7 @@ function list(req, res) {
             }
             res.status(200).send({ meta: meta, data: response.rows })
         }).catch((err) => {
+            console.error(err)
             res.sendStatus(500)
         })
     }
@@ -321,9 +345,6 @@ function submit(req, res) {
         return res.status(401).send({ error: 'No se encuentra autorizado' })
 
     req.body = req.body.data
-
-    console.log("************** INFORMACION DE LOS ARCHIVOS *****************");
-    console.log(req.files)
 
     if (!req.files['code'] || !req.body.language)
         return res.status(400).send({ error: 'Datos incompletos' })
@@ -339,7 +360,6 @@ function submit(req, res) {
     req.body.file_path = filePathExecution
 
     if(req.files['svgBlocklyCode']){
-        console.log('svg COOOooooooooooooooooooooooooooooooooooooODE', req.files['svgBlocklyCode'])
         req.body.blockly_file_name = req.files['svgBlocklyCode'][0].filename
     }
     
@@ -348,6 +368,7 @@ function submit(req, res) {
 
     Submission.create(req.body)
         .then(submission => {
+        
             Grader.judge(submission.id, isContest, fileNameExecution, filePathExecution)
             return res.status(200).send(submission)
         })
@@ -357,6 +378,12 @@ function submit(req, res) {
         })
 }
 
+/**
+ * obtener tipo de categoría del problema (colegio, univercisad)
+ * @param {*} req 
+ * @param {*} res 
+ * @returns 
+ */
 function validateCategory(req, res){
 
     Category.findOne({

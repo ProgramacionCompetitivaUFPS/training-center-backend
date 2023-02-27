@@ -36,6 +36,10 @@ module.exports = (sequelize, DataTypes) => {
                 key: 'id'
             }
         },
+        type: {
+            allowNull: false,
+            type: DataTypes.INTEGER
+        },
         public: {
             allowNull: false,
             type: DataTypes.BOOLEAN
@@ -49,11 +53,6 @@ module.exports = (sequelize, DataTypes) => {
                     msg: "Debe proporcionar una contraseña válida."
                 }
             }
-        },
-        type: {
-            allowNull: false,
-            type: DataTypes.INTEGER,
-            defaultValue: 0
         }
     }, {
         underscored: true,
@@ -62,6 +61,7 @@ module.exports = (sequelize, DataTypes) => {
 
     Contests.associate = function(models) {
         Contests.belongsTo(models.users)
+        
 
         Contests.belongsToMany(models.problems, {
             through: 'contests_problems',
@@ -72,12 +72,6 @@ module.exports = (sequelize, DataTypes) => {
         Contests.belongsToMany(models.users, {
             through: 'contests_students',
             as: 'users',
-            onDelete: 'CASCADE'
-        })
-
-        Contests.belongsToMany(models.teams, {
-            through: 'contests_teams',
-            as: 'teams',
             onDelete: 'CASCADE'
         })
     }

@@ -1,15 +1,23 @@
 'use strict'
 
 const Contest = require('../models').contests
+const Enums = require('../helpers/enums')
 const ContestProblems = require('../models').contests_problems
 const Submissions = require('../models').submissions
 const Problem = require('../models').problems
 const User = require('../models').users
+const Institution = require('../models').institutions
 const ContestStudent = require('../models').contests_students
 const _ = require('lodash')
 const moment = require('moment')
 
+const env = process.env.NODE_ENV || "development"
+const config = require('../config/config.js')[env]
+
 const Sequelize = require('sequelize')
+const sequelize = new Sequelize(config.url, config)
+
+const {categories: Category} = require("../models");
 const Op = Sequelize.Op
 
 /**
@@ -41,6 +49,7 @@ function create(req, res) {
             return res.sendStatus(201)
         })
         .catch(error => {
+            console.error(error)
             error = _.omit(error, ['parent', 'original', 'sql'])
             return res.status(500).send(error)
         })
@@ -55,7 +64,7 @@ function index(req, res) {
                 model: User,
                 attributes: ['name', 'id', 'username', 'email']
             }],
-            attributes: ['id', 'title', 'description', 'init_date', 'end_date', 'rules', 'public', 'key']
+            attributes: ['id', 'title', 'description', 'init_date', 'end_date', 'rules', 'public','type', 'key']
         })
         .then((contest) => {
             return res.status(200).send({ contest })
@@ -85,7 +94,6 @@ function update(req, res) {
         return res.status(400).send({ error: 'La duración mínima de la maraton debe ser 30 minutos' })
 
     req.body.user_id = req.user.sub
-
     Contest.findByPk(req.params.id).then(contest => {
         let init_date = moment(contest.init_date)
         let end_date = moment(contest.end_date)
@@ -106,9 +114,11 @@ function update(req, res) {
         ).then(updated => {
             return res.status(200).send(req.body)
         }).catch((err) => {
+            console.error(err)
             return res.sendStatus(500)
         })
     }).catch((err) => {
+        console.error(err)
         return res.sendStatus(500)
     })
 }
@@ -174,6 +184,12 @@ function getProblems(req, res) {
     })
 }
 
+/**
+ * Agregar problemas a la maratón
+ * @param {*} req 
+ * @param {*} res 
+ * @returns 
+ */
 function addProblems(req, res) {
     if (!req.body.problems)
         return res.status(400).send({ error: 'Datos incompletos' })
@@ -191,11 +207,55 @@ function addProblems(req, res) {
             if (init_date < moment())
                 return res.status(400).send({ error: 'No se puede modificar una maraton que ya inició' })
 
-            contest.addProblems(req.body.problems).then((problems) => {
-                return res.sendStatus(201)
-            }).catch((err) => {
-                return res.sendStatus(500)
-            })
+                const contest_problems = []
+                const contest_type = Enums.typeContest.getName(contest.type)
+                
+                //validar que el tipo de maratón sea correspondiente al tipo de problema que va a guardar
+                var validate_problems = new Promise((resolve, reject) => {
+                    req.body.problems.forEach((problem_id, index, array) => {
+                        Problem.findOne({
+                            where: {
+                                id: problem_id
+                            },
+                            include: [
+                                { model: Category, attributes: ['name', 'id', 'type'] },
+                            ]
+                        })
+                        .then((problem) => {
+                            const problem_type = Enums.typeCategory.getName(problem.category.type)
+                            
+                            if(problem_type !== contest_type){
+                               
+                                const contest_type_spanish = Enums.typeContest.getNameSpanish(contest.type)
+
+                                reject ({status:400, error: 'No se puede agregar un problema de tipo diferente en una maratón de '+ contest_type_spanish})
+                            }
+                            
+                            
+                            contest_problems.push({problem_id: problem_id, contest_id: contest.id});
+
+                            if (index === array.length -1){
+                                resolve()
+                            }
+
+                        }).catch((err) => {
+                            console.error(err)
+                            reject({status:500, error: err})
+                        })
+                    })
+                })
+                
+                validate_problems.then((validate) => {
+                    ContestProblems.bulkCreate(contest_problems).then((problems) =>{
+                        return res.sendStatus(201)
+                    }).catch((err) => {
+                        console.error(err)
+                        return res.sendStatus(500)
+                    })
+                }).catch((err) =>{
+                    console.error(err)
+                    return res.status(err.status).send({ error: err.error })
+                })
         })
         .catch((err) => {
             return res.status(500).send({ error: `${err}` })
@@ -250,9 +310,12 @@ function registerStudent(req, res) {
             if (end_date < moment())
                 return res.status(400).send({ error: 'No se puede registrar en una maraton que ya acabo' })
 
-            contest.addUsers(req.user.sub).then((user) => {
+            const contest_student = {user_id: req.user.sub, contest_id: contest.id}
+
+            ContestStudent.create(contest_student).then((user) => {
                 return res.sendStatus(201)
             }).catch((err) => {
+                console.error(err)
                 return res.sendStatus(500)
             })
         })
@@ -287,10 +350,26 @@ function removeStudent(req, res) {
 }
 
 function list(req, res) {
-    console.log(req.query)
     let limit = (req.query.limit) ? parseInt(req.query.limit) : 10
     let offset = (req.query.page) ? limit * (parseInt(req.query.page) - 1) : 0
+    let by = (req.query.by) ? req.query.by : 'DESC'
+    let orderQuery = (req.query.order)
+    let orderF = null;
+    if(orderQuery){
+        switch (orderQuery){
+            case "Id": orderF="id"
+                break;
+            case "Nombre": orderF="title"
+                break;
 
+        }
+    }else{
+        orderF="id"
+    }
+
+    let order = [];
+
+    order[0] = [orderF, by]
     let condition = {}
     let meta = {}
 
@@ -300,7 +379,9 @@ function list(req, res) {
         condition.id = {
             [Op.ne]: null
         }
-
+    if (req.query.type){
+        condition.type = req.query.type
+    }
     if (req.query.filter) {
         if (req.query.filter == 'private') condition.public = false
         else condition.public = true
@@ -327,16 +408,14 @@ function list(req, res) {
 
     Contest.findAndCountAll({
         where: condition,
-        include: [{
-            model: User,
-            attributes: ['name', 'id', 'username', 'email']
-        }],
-        attributes: ['id', 'title', 'description', 'init_date', 'end_date', 'rules', 'public', 'key'],
+        include:
+            [
+                { model: User, attributes: ['name', 'id', 'username','email'] },
+            ],
+        attributes: ['id', 'title', 'description', 'init_date', 'end_date', 'rules', 'public', 'key', 'type'],
         limit: limit,
         offset: offset,
-        order: [
-            ['init_date', 'DESC']
-        ]
+        order: order
     }).then((response) => {
         meta.totalPages = Math.ceil(response.count / limit)
         meta.totalItems = response.count
@@ -346,6 +425,7 @@ function list(req, res) {
         }
         res.status(200).send({ meta: meta, data: response.rows })
     }).catch((err) => {
+        console.error(err)
         return res.status(500).send({ error: `${err}` })
     })
 }
@@ -396,6 +476,37 @@ function hasPermission(user_id, contest_id, cb) {
     })
 }
 
+function getContestsByInstitution(req, res){
+    let limit = (req.query.limit) ? parseInt(req.query.limit) : 10
+    let offset = (req.query.page) ? limit * (parseInt(req.query.page) - 1) : 0
+    let idInstitution = req.params.idInstitution;
+
+    let condition = {}
+    let meta = {}
+
+    condition.institution_id = idInstitution
+
+    sequelize.query(
+        'select distinct contests.id, contests.title, contests.public, contests.init_date from contests as contests' +
+        " inner join contests_problems as cprob on cprob.contest_id = contests.id " +
+        "inner join submissions as submissions on cprob.id = submissions.contest_problem_id " +
+        "inner join users as users on submissions.user_id = users.id && users.institution_id =" +idInstitution+
+        " group by contests.id, submissions.id, users.id order by contests.id " +
+        " LIMIT "+ offset+ ", "+limit, {   type: Sequelize.QueryTypes.SELECT }
+    )
+    .then((response) => {
+        meta.totalItems = response.length
+        meta.totalPages = Math.ceil(response.length / limit)
+
+        if (offset >= response[0].count) {
+            return res.status(200).send({ meta })
+        }
+        res.status(200).send({ meta: meta, data: response})
+    }).catch((err) => {
+        return res.status(500).send({ error: `${err}` })
+    })
+}
+
 module.exports = {
     create,
     index,
@@ -408,5 +519,6 @@ module.exports = {
     registerStudent,
     removeStudent,
     isRegister,
-    hasPermission
+    hasPermission,
+    getContestsByInstitution
 }

@@ -11,6 +11,7 @@ const syllabuses = require("../routes/syllabuses");
 const assignments = require("../routes/assignments");
 const contests = require("../routes/contests");
 const submissions = require("../routes/submissions");
+const institutions = require("./institutions")
 const auth = require("../middlewares/auth");
 const authCtrl = require("../controllers/auth");
 const userCtrl = require("../controllers/users");
@@ -27,6 +28,7 @@ router.use("/syllabus", syllabuses);
 router.use("/assignments", assignments);
 router.use("/contests", contests);
 router.use("/submissions", submissions);
+router.use("/institutions", institutions);
 
 /* GET home page. */
 router.get("/", function(req, res, next) {
