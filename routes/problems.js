@@ -33,6 +33,7 @@ var submissionUploadCode = submissionCode.fields([
  */
 
 problems.get('/:id', auth.isAuth, problemsCtrl.get )
+problems.get('/:id/:folder/:filename', auth.isAuth, problemsCtrl.getDataFile )
 problems.get('/:id/validateCategory', auth.isAuth, problemsCtrl.validateCategory )
 problems.get('/', auth.isAuth, problemsCtrl.list )
 problems.post('/:id/submit', auth.isAuth, submissionUploadCode, problemsCtrl.submit )

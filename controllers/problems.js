@@ -5,9 +5,9 @@ const Submission = require('../models').submissions
 const Category = require('../models').categories
 const User = require('../models').users
 const Grader = require('../controllers/grader')
+const path = require('path')
 const _ = require('lodash')
 const files = require('../services/files')
-
 const Sequelize = require('sequelize')
 const Op = Sequelize.Op
 
@@ -154,6 +154,10 @@ function get(req, res) {
         })
 }
 
+function getDataFile(req, res) {
+    return res.sendFile(path.join(path.dirname(__dirname), 'files', req.params.folder, req.params.filename))
+}
+
 function list(req, res) {
     let limit = (req.query.limit) ? parseInt(req.query.limit) : 10
     let order = []
@@ -270,7 +274,7 @@ function list(req, res) {
             Problem.findAndCountAll({
                 where: condition,
                 distinct: 'id',
-                attributes: ['id', 'title_es', 'title_en', 'level'],
+                attributes: ['id', 'title_es', 'title_en', 'level', 'input', 'output'],
                 include: [{
                     model: Submission,
                     as: 'submissions',
@@ -368,7 +372,7 @@ function submit(req, res) {
 
     Submission.create(req.body)
         .then(submission => {
-        
+
             Grader.judge(submission.id, isContest, fileNameExecution, filePathExecution)
             return res.status(200).send(submission)
         })
@@ -417,6 +421,7 @@ module.exports = {
     remove,
     list,
     get,
+    getDataFile,
     submit,
     validateCategory
 }
