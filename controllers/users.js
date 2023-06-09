@@ -340,6 +340,22 @@ function getSubmission(req, res) {
     return res.sendFile(path.join(path.dirname(__dirname), 'files', 'codes', req.params.submission))
 }
 
+function getSubmissionLog(req, res) {
+    const fs = require('fs');
+    const filePath = path.join(path.dirname(__dirname), 'files', 'errors', req.params.submission);
+
+    try {
+        if (fs.existsSync(filePath)) {
+        return res.sendFile(filePath);
+        } else {
+        return undefined
+        }
+    } catch (err) {
+        console.error(err);
+        return res.status(500).send('Internal Server Error');
+    }
+}
+
 function getSubmissionsbyContest(req, res) {
 
     if(req.user.usertype === 0){
@@ -417,6 +433,7 @@ module.exports = {
     removeAccounts,
     getSubmissions,
     getSubmission,
+    getSubmissionLog,
     getUser,
     getUserByInstitution,
     getSubmissionsbyContest,
