@@ -5,6 +5,7 @@ const Problem = require('../models').problems
 const Submission = require('../models').submissions
 const Category = require('../models').categories
 const User = require('../models').users
+const path = require('path')
 const Grader = require('../controllers/grader')
 const _ = require('lodash')
 const files = require('../services/files')
@@ -153,6 +154,10 @@ function get(req, res) {
         .catch((err) => {
             return res.status(500).send({ error: `${err}` })
         })
+}
+
+function getDataFile(req, res) {
+    return res.sendFile(path.join(path.dirname(__dirname), 'files', req.params.folder, req.params.filename))
 }
 
 function getSubmissions(req, res) {
@@ -430,7 +435,7 @@ function list(req, res) {
         Problem.findAndCountAll({
             where: condition,
             distinct: 'id',
-            attributes: ['id', 'title_es', 'title_en', 'level', 'user_id', 'category_id'],
+            attributes: ['id', 'title_es', 'title_en', 'level', 'user_id', 'category_id', 'input', 'output'],
             limit: limit,
             include: [
               {
@@ -586,6 +591,7 @@ module.exports = {
     remove,
     list,
     get,
+    getDataFile,
     submit,
     validateCategory,
     getSubmissions
