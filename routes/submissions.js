@@ -11,5 +11,6 @@ const auth = require('../middlewares/auth')
 
 submissions.get('/:submission', auth.isAuth, userCtrl.getSubmission )
 submissions.get('/:submission/svgSubmission', auth.isAuth, userCtrl.getSvgSubmission)
+submissions.get('/:submission/log', auth.isAuth, userCtrl.getSubmissionLog)
 
 module.exports = submissions;

@@ -36,7 +36,8 @@
         "sequelize": "^5.8.6",
         "sequelize-cli": "^5.4.0",
         "serve-favicon": "~2.3.0",
-        "socket.io": "^2.0.4"
+        "socket.io": "^2.0.4",
+        "typings": "^2.1.1"
     },
     "devDependencies": {
         "mocha": "^3.2.0",
