@@ -224,7 +224,7 @@ function getSubmissions(req, res) {
                 
 
                 sequelize.query(
-                    `select s.id, u.name , u.username, s.language,s.execution_time , s.verdict, s.created_at
+                    `select s.id, u.name , u.username, s.language,s.execution_time , s.verdict, s.created_at, s.file_name
                     from submissions s 
                     inner join problems p on p.id = s.problem_id
                     left join users u on u.id = s.user_id
@@ -396,6 +396,8 @@ function list(req, res) {
                         (SUM(CASE WHEN submissions.verdict = 'Accepted' THEN 1 ELSE 0 END) / COUNT(submissions.id)) * 100 AS approval_rate
                     FROM
                         (SELECT problems.id,
+                            problems.input,
+                            problems.output,
                             problems.title_es,
                             problems.title_en,
                             problems.level,
@@ -521,6 +523,8 @@ function formatProblem(row) {
     return {
       id: row.dataValues.id,
       title_es: row.dataValues.title_es,
+      input: row.dataValues.input,
+      output: row.dataValues.output,
       title_en: row.dataValues.title_en,
       level: row.dataValues.level,
       approval_rate: row.dataValues.approval_rate,
@@ -543,7 +547,7 @@ function formatSubmission(row) {
       id: row.id,
       language: row.language,
       execution_time: row.execution_time,
-      language: row.language,
+      file_name: row.file_name,
       verdict: row.verdict,
       created_at: row.created_at,
       user:{
