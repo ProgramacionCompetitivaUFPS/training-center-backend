@@ -1,0 +1,13 @@
+FILES=pathFiles
+FRONTEND_PORT=82
+BACKEND_PORT=3000
+DATABASE_PORT=3306
+DATABASE_URL=mysql://dbuser:dbpassword@dbhost/dbname
+NODE_ENV=production
+SECRET_TOKEN=84515EA65656DB656C565231987A94651321984893DD68489CCCD651AC6165BB
+SMTP_HOST=smtp.zoho.com
+SMTP_USER=competitiveprogramming@cloud.ufps.edu.co
+SMTP_PASSWORD=RlicSpv2006*
+FROM_ACCOUNT=competitiveprogramming@cloud.ufps.edu.co
+SMTP_SERVICE=Zoho
+SMTP_PORT=587

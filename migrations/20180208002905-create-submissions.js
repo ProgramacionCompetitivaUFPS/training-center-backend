@@ -48,11 +48,6 @@ module.exports = {
                 allowNull: false,
                 type: Sequelize.STRING
             },
-            user_team_id: {
-                allowNull: true,
-                type: Sequelize.INTEGE,
-                defaultValue: 0
-            },
             assignment_problem_id: {
                 type: Sequelize.INTEGER,
                 references: {
@@ -76,6 +71,18 @@ module.exports = {
             updated_at: {
                 allowNull: false,
                 type: Sequelize.DATE
+            },
+            contests_problem_id: {
+                type: Sequelize.INTEGER,
+                references: {
+                    model: 'contests_problems',
+                    key: 'id'
+                },
+                allowNull: true
+            },
+            blockly_file_name: {
+                type: Sequelize.STRING,
+                allowNull: true
             },
             user_team_id: {
                 type: Sequelize.INTEGER,

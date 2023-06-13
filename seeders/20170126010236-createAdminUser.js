@@ -18,24 +18,16 @@ module.exports = {
         return queryInterface.bulkInsert('users', [{
             id: 1,
             name: 'Admin',
-            email: 'programacioncompetitivaufps@gmail.com',
-            password: '$2a$10$6LbPFQDH6/.N.Z4QBs/9puHZgRGfFOZppEa8pqNT9KOK0SiLfNSA.',
+            email: 'admin@gmail.com',
+            //password: 12345
+            password: '$2a$10$/OM4Ay1D6RzRvpTBV3MfbeNP/2ZMlMzsIctEde8OKWAPRtxhUjkRC',
+            code: 0,
             type: 2,
             username: 'admin',
             institution_id: 1,
             created_at: new Date(),
             updated_at: new Date()
-        },{
-            id: 2,
-            name: 'Admin2',
-            email: 'genesisdanielavjau@ufps.edu.co',
-            password: '$2a$10$gkCO2e51GUC69Y6NQ.MovuWPF3yqxLh/70SLGKa2CXi2uUaL4r.y.',
-            type: 2,
-            username: 'admin2',
-            institution_id: 1,
-            created_at: new Date(),
-            updated_at: new Date()
-        }], {});
+        }])
     },
 
     /**

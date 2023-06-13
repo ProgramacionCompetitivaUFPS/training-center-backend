@@ -25,17 +25,13 @@ module.exports = {
           allowNull: true,
           type: Sequelize.STRING
         },
-        create_at: {
+        created_at: {
             allowNull: false,
             type: Sequelize.DATE
         },
-        update_at: {
+        updated_at: {
             allowNull: false,
             type: Sequelize.DATE
-        },
-        institution: {
-            allowNull: false,
-            type: Sequelize.INTEGER
         },
         type: {
           allowNull: false,
@@ -44,6 +40,10 @@ module.exports = {
         short_name: {
           allowNull: true,
           type: Sequelize.STRING
+        },
+        private: {
+          allowNull: false,
+          type: Sequelize.INTEGER
         }
     });
 },

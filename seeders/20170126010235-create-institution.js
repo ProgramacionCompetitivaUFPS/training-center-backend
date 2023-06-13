@@ -14,11 +14,14 @@ module.exports = {
         {
           id: 1,
           name: "Universidad Francisco de Paula Santander",
-          country: "colombia",
-          institution: 0,
+          country: "Colombia",
+          telephone: null,
+          address: null,
+          private: 0,
           type: 0,
+          short_name: "UFPS",
           created_at: new Date(),
-          updated_at: new Date(),
+          updated_at: new Date()
         },
       ],
       {}

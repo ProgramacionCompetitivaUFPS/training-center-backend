@@ -48,10 +48,6 @@ module.exports = {
                 allowNull: false,
                 type: Sequelize.TEXT
             },
-            description_es: {
-                allowNull: true,
-                type: Sequelize.TEXT
-            },
             created_at: {
                 allowNull: false,
                 type: Sequelize.DATE
@@ -79,10 +75,6 @@ module.exports = {
             visibility: {
                 allowNull: true,
                 type: Sequelize.INTEGER
-            },
-            solution_url: {
-                allowNull: true,
-                type: Sequelize.STRING
             },
         });
     },

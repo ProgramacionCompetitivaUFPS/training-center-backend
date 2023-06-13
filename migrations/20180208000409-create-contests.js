@@ -56,15 +56,7 @@ module.exports = {
                 allowNull: false,
                 type: Sequelize.INTEGER,
                 defaultValue: 0
-            },
-            institution_id: {
-                allowNull: false,
-                type: Sequelize.INTEGER,
-                references: {
-                    model: 'institutions',
-                    key: 'id'
-                }
-            },
+            }
         });
     },
     down: (queryInterface, Sequelize) => {
