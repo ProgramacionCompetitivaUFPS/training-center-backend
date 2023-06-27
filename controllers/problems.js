@@ -396,8 +396,6 @@ function list(req, res) {
                         (SUM(CASE WHEN submissions.verdict = 'Accepted' THEN 1 ELSE 0 END) / COUNT(submissions.id)) * 100 AS approval_rate
                     FROM
                         (SELECT problems.id,
-                            problems.input,
-                            problems.output,
                             problems.title_es,
                             problems.title_en,
                             problems.level,
@@ -413,7 +411,7 @@ function list(req, res) {
                         WHERE problems.category_id = :category
                         GROUP BY problems.id
                         ORDER BY :order :by
-                        LIMIT :offset, :limit) AS problems
+                        ) AS problems
                     LEFT OUTER JOIN submissions AS submissions ON problems.id = submissions.problem_id
                     GROUP BY problems.id
                     ORDER BY `+order_sql+` `+by+`
@@ -437,7 +435,7 @@ function list(req, res) {
         Problem.findAndCountAll({
             where: condition,
             distinct: 'id',
-            attributes: ['id', 'title_es', 'title_en', 'level', 'user_id', 'category_id', 'input', 'output'],
+            attributes: ['id', 'title_es', 'title_en', 'level', 'user_id', 'category_id'],
             limit: limit,
             include: [
               {
@@ -481,6 +479,7 @@ function list(req, res) {
             });
     }          
 }
+
 
 function submit(req, res) {
     if (req.user.usertype == 2)
