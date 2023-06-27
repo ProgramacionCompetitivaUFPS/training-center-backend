@@ -390,6 +390,8 @@ function list(req, res) {
                         (SUM(CASE WHEN submissions.verdict = 'Accepted' THEN 1 ELSE 0 END) / COUNT(submissions.id)) * 100 AS approval_rate
                     FROM
                         (SELECT problems.id,
+                            problems.input,
+                            problems.output,
                             problems.title_es,
                             problems.title_en,
                             problems.level,
@@ -429,7 +431,7 @@ function list(req, res) {
         Problem.findAndCountAll({
             where: condition,
             distinct: 'id',
-            attributes: ['id', 'title_es', 'title_en', 'level', 'user_id', 'category_id'],
+            attributes: ['id', 'title_es', 'title_en', 'level', 'user_id', 'category_id','input', 'output'],
             limit: limit,
             include: [
               {
